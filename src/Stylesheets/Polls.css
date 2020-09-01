@@ -1,0 +1,11 @@
+.poll {
+    border: 0.1em solid black;
+    height: auto;
+    background-color: skyblue;
+    border-radius: 8%;
+}
+
+h4 {
+    text-align: center;
+    padding-top: 0.5em;
+}

@@ -1,20 +1,33 @@
 {
   "name": "personal-website",
+  "author": "Jonathon Brandt",
+  "description": "Jonathon Brandt's personal website",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.5.0",
     "@testing-library/user-event": "^7.2.1",
+    "bootstrap": "^4.5.2",
+    "jquery": "^3.5.1",
+    "mongodb": "^3.6.0",
+    "mongoose": "^5.10.2",
+    "path": "^0.12.7",
+    "popper.js": "^1.16.1",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
-    "react-scripts": "3.4.3"
+    "react-dropdown": "^1.8.0",
+    "react-router-dom": "^5.2.0",
+    "react-scripts": "3.4.3",
+    "xmlhttprequest": "^1.8.0"
   },
   "scripts": {
+    "server": "node server --exec nodemon | pino-colada",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "dev": "run-p start server"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -30,5 +43,14 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "proxy": "http://localhost:3001",
+  "devDependencies": {
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
+    "express-pino-logger": "^5.0.0",
+    "nodemon": "^2.0.4",
+    "npm-run-all": "^4.1.5",
+    "pino-colada": "^2.1.0"
   }
 }

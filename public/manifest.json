@@ -1,19 +1,19 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "JB's App",
+  "name": "Jonathon Brandt's Application",
   "icons": [
     {
-      "src": "favicon.ico",
+      "src": "comic_self.ico",
       "sizes": "64x64 32x32 24x24 16x16",
       "type": "image/x-icon"
     },
     {
-      "src": "logo192.png",
+      "src": "comic_self.png",
       "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "logo512.png",
+      "src": "comic_self.png",
       "type": "image/png",
       "sizes": "512x512"
     }

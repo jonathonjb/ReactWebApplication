@@ -1,0 +1,37 @@
+
+/*#chat-box {
+    background-color: whitesmoke; /* CHANGE COLOR LATER; THIS IS ONLY TO MAKE DIV OBVIOUS DURING TESTING
+    height: 55vh;
+    width: 80vw;
+    margin-left: 5vw;
+    overflow-y: scroll;
+}
+
+#chat-message {
+    width: 70vw;
+    margin-left: 5vw;
+}*/
+
+
+#chat-box{
+    background-color: whitesmoke;
+    border: 0.1em solid #666666;
+    height: 23em;
+    border-radius: 5%;
+    overflow-y: scroll;
+}
+
+textarea{
+    border: 0.1em solid #666666;
+}
+
+.message-box{
+    background-color: #666666;
+    color: white;
+    text-align: center;
+    display: inline-block;
+    border-radius: 1em;
+    /*margin: 1em 1em 1em 1em;*/
+    margin-top: 0.8em;
+    padding: 0.3em 0.3em 0.3em 0.3em;
+}
