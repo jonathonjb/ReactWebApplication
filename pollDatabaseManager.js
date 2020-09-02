@@ -42,7 +42,7 @@ const getPollInstace = async (id) => {
 
 const saveUpdatedPollInstance = async (updatedInstance) => {
     try{
-        return await Poll.findByIdAndUpdate(updatedInstance._id, {"votes": updatedInstance.votes});
+        return await Poll.findByIdAndUpdate(updatedInstance._id, {"votes": updatedInstance.votes}, {new: true});
     }
     catch(error){
         console.log('problem saving updated poll instance')

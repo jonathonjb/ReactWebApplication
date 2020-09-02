@@ -11,12 +11,12 @@ const urlencodedParser = bodyParser.urlencoded({extended: false});
 
 //------------------------------------------------------------------------------------------------------------------------
 
-//app.use(express.static(path.join(__dirname, "build")));
+app.use(express.static(path.join(__dirname, "build")));
 app.use(pino);
    
-/*app.get('/', (req, res) => {
+app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, "build", "index.html"));
-});*/
+});
 
 
 app.post('/chat/message_submit', jsonParser, (req, res) => {
@@ -33,7 +33,6 @@ app.post('/chat/message_submit', jsonParser, (req, res) => {
 });
 
 app.post('/chat/remove_all', (req, res) => {
-    //let test = deleteAllChatInstances();
     deleteAllChatInstances().then(data => {
         if(data === false){
             res.send(JSON.stringify({
@@ -120,6 +119,7 @@ app.post('/polls/submit', jsonParser, (req, res) => {
             if(data === null){
                 res.send(JSON.stringify({"status": "failure"}));
             }
+            console.log(data);
             res.send(JSON.stringify({"status": "success", "data": data}));
         });
     });

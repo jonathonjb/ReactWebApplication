@@ -1,6 +1,7 @@
 import React from 'react'
 import '../Stylesheets/Polls.css'
 import $ from 'jquery'
+import Poll from './Poll'
 
 const xhr = new XMLHttpRequest();
 
@@ -12,6 +13,7 @@ class Polls extends React.Component {
             ids: [],
             questions: [],
             choices: [],
+            polls: [],
 
             numChoiceTextareas: 2,
             questionValue: "",
@@ -34,7 +36,6 @@ class Polls extends React.Component {
         this.sendPollInstance = this.sendPollInstance.bind(this);
         this.getAllPollInstances = this.getAllPollInstances.bind(this);
         this.deleteAllPollInstances = this.deleteAllPollInstances.bind(this);
-        this.sendPollSubmit = this.sendPollSubmit.bind(this);
 
         this.componentDidMount = this.componentDidMount.bind(this);
     }
@@ -63,29 +64,8 @@ class Polls extends React.Component {
      */
     renderPollingArea(){
         let polls = [];
-        for(let i = 0; i < this.state.ids.length; i++){
-            let choices = this.state.choices[i];
-            let choicesInputs = [];
-
-            let groupName = "Poll" + i;
-            for(let j = 0; j < choices.length; j++){
-                choicesInputs = [...choicesInputs, <div key={groupName + j}>
-                    <input type="radio" value={choices[j]} name={groupName}/><label>&nbsp;{choices[j]}</label><br />
-                </div>]
-            }
-
-            let currDiv = <div key={groupName}>
-                <br />
-                <div className="row justify-content-center">
-                    <div className="poll col-md-10" id={this.state.ids[i]}>
-                        <h4><b>{this.state.questions[i]}</b></h4> {/* Prints out the poll Quesion on the top of the poll box */}
-                        <form>{choicesInputs}</form> {/* Prints out each of the choices amongside a radio button */}
-                        <center><button className="btn" onClick={() => {this.sendPollSubmit(this.state.ids[i], groupName)}}><b>
-                            Submit</b></button></center>
-                    </div>
-                </div>
-            </div>
-            polls = [...polls, currDiv];
+        for(let i = 0; i < this.state.polls.length; i++){
+            polls = [...polls, <Poll poll={this.state.polls[i]}/>];
         }
 
         return polls;
@@ -102,7 +82,6 @@ class Polls extends React.Component {
                 <div className="row justify-content-center">
                     <textarea id={i + "ChoiceTA"} rows="1" className="col-6 choiceTextarea" 
                         onChange={this.choiceOnChange} placeholder="Choice" />
-                        {this.state.choiceTextareaValues[i]}
                 </div>
             </div>)
         }
@@ -111,9 +90,7 @@ class Polls extends React.Component {
 
     clearPollingAreaStates(){
         this.setState({
-            ids: [],
-            questions: [],
-            choices: []
+            polls: []
         });
     }
 
@@ -147,29 +124,8 @@ class Polls extends React.Component {
 
     addPollInstance(pollInstance){
         this.setState({
-            ids: [...this.state.ids, pollInstance._id],
-            questions: [...this.state.questions, pollInstance.question],
-            choices: [...this.state.choices, pollInstance.choices]
+            polls: [...this.state.polls, pollInstance]
         });
-    }
-
-    sendPollSubmit(pollId, groupName){
-        let value = $('input[name=' + groupName + ']:checked').val()
-        let url = '/polls/submit';
-        xhr.open('POST', url, true);
-        xhr.setRequestHeader('Content-Type', 'application/json')
-        xhr.onreadystatechange = () => {
-            if(xhr.readyState === 4 && xhr.status === 200){
-                let obj = JSON.parse(xhr.responseText).data;
-                console.log(obj);
-
-                let reducer = (total, num) => {return total + num};
-                let totalVotes = obj.votes.reduce(reducer);
-
-
-            }
-        }
-        xhr.send(JSON.stringify({"id": pollId, "choice": value}));
     }
 
     sendPollInstance(){
@@ -214,11 +170,7 @@ class Polls extends React.Component {
         xhr.setRequestHeader('Content-Type', 'application/json');
         xhr.onreadystatechange = () => {
             if(xhr.readyState === 4 && xhr.status === 200){
-                this.setState({
-                    ids: [],
-                    questions: [],
-                    choices: []
-                });
+                this.clearPollingAreaStates();
             }
         }
         xhr.send(null);

@@ -48,7 +48,7 @@ const getAllMessages = () => {
                     let message = item.message;
                     let newDiv = document.createElement('div');
                     newDiv.classList.add('message-box');
-                    newDiv.innerHTML = name + "<br/>" + message;
+                    newDiv.innerHTML = "<i>" + name + "</i> <br/>" + message;
                     chatBox.appendChild(newDiv);
                     chatBox.appendChild(document.createElement('br'));
                 });
