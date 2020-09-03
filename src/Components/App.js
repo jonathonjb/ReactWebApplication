@@ -19,7 +19,7 @@ import Resume from './Resume';
 function App() {
   return (
     <div className="App">
-      <Nav />
+      <Nav /> 
       <div className="container">
         <Switch>
           <Route path='/' component={Home} exact />

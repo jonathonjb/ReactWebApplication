@@ -1,4 +1,5 @@
 import React from 'react'
+import '../Stylesheets/Poll.css'
 import $ from 'jquery'
 
 const xhr = new XMLHttpRequest();
@@ -24,16 +25,16 @@ export default class Poll extends React.Component {
 
         // creates a list of 'choice' radio buttons
         if(!this.state.hasVoted){
-            for(let j = 0; j < choices.length; j++){
-                choicesInputs = [...choicesInputs, <div key={this.state.groupName + j}>
-                    <input type="radio" value={choices[j]} name={this.state.groupName}/><label>&nbsp;{choices[j]}</label><br />
+            for(let i = 0; i < choices.length; i++){
+                choicesInputs = [...choicesInputs, <div key={this.state.groupName + i}>
+                    <input type="radio" value={choices[i]} name={this.state.groupName}/><label>&nbsp;{choices[i]}</label><br />
                 </div>]
             }
     
             let currDiv = <div key={this.state.groupName}>
                 <br />
                 <div className="row justify-content-center">
-                    <div className="poll col-md-10">
+                    <div className="poll col-md-10 rounded shadow">
                         <h4><b>{this.state.poll.question}</b></h4> 
                         <form>{choicesInputs}</form>
                         <center><button className="btn" onClick={() => {this.sendPollSubmit()}}><b>
@@ -48,12 +49,14 @@ export default class Poll extends React.Component {
             let choicesArray = [];
                 for(let i = 0; i < choices.length; i++){
                     let percentage = 100 * (this.state.poll.votes[i] / this.state.totalVotes);
-                    choicesArray = [...choicesArray, <div>
-                        {choices[i]}
-                        <div className='progress'>
-                            <div className='progress-bar' style={{"width": percentage + "%"}}></div>
+                    choicesArray = [...choicesArray, <div key={this.state.groupName + "voted" + i} className="row">
+                        <div className="col-md-2">{choices[i]}</div>
+                        <div className="col-md-8">
+                            <div className='progress'>
+                                <div className='progress-bar progress-bar-striped bg-info' style={{"width": percentage + "%"}}></div>
+                            </div>
                         </div>
-                        {this.state.poll.votes[i]} votes
+                        <div className="col-md-2">{this.state.poll.votes[i]} votes</div>
                     </div>]
                 }
 
@@ -73,7 +76,6 @@ export default class Poll extends React.Component {
 
     sendPollSubmit(){
         let value = $('input[name=' + this.state.groupName + ']:checked').val();
-        console.log(value);
         let url = '/polls/submit';
         xhr.open('POST', url, true);
         xhr.setRequestHeader('Content-Type', 'application/json')

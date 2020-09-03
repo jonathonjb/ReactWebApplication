@@ -1,0 +1,26 @@
+#board {
+    border: 0.23em solid black;
+    padding: 0;
+}
+
+.tile, .pieceImg {
+    height: 4em;
+    width: 4em;
+}
+
+.pieceImg {
+    cursor: pointer;
+}
+
+.lightBg {
+    background-color: tan;
+}
+
+.darkBg {
+    background-color: brown;
+}
+
+.boardRow {
+    display: flex;
+    flex-wrap: wrap;
+}

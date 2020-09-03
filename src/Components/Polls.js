@@ -1,6 +1,5 @@
 import React from 'react'
 import '../Stylesheets/Polls.css'
-import $ from 'jquery'
 import Poll from './Poll'
 
 const xhr = new XMLHttpRequest();
@@ -65,7 +64,7 @@ class Polls extends React.Component {
     renderPollingArea(){
         let polls = [];
         for(let i = 0; i < this.state.polls.length; i++){
-            polls = [...polls, <Poll poll={this.state.polls[i]}/>];
+            polls = [...polls, <Poll key={"poll" + i} poll={this.state.polls[i]}/>];
         }
 
         return polls;

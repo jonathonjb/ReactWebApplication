@@ -119,7 +119,6 @@ app.post('/polls/submit', jsonParser, (req, res) => {
             if(data === null){
                 res.send(JSON.stringify({"status": "failure"}));
             }
-            console.log(data);
             res.send(JSON.stringify({"status": "success", "data": data}));
         });
     });
