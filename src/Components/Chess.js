@@ -123,65 +123,19 @@ export default class Chess extends React.Component{
             for(let i = 0; i < this.state.eligiblePositions.length; i++){
                 if(this.state.eligiblePositions[i] === Logics.KINGSIDE_CASTLE){
                     // white
-                    if(col === 6){
-                        let newBoard = this.state.board.map(row => row.slice());
-                        newBoard[7][5] = Logics.ROOK;
-                        newBoard[7][6] = Logics.KING;
-                        newBoard[7][4] = Logics.EMPTY;
-                        newBoard[7][7] = Logics.EMPTY;
-                        this.setState({
-                            board: newBoard,
-                            activePosition: [-1, -1],
-                            eligiblePositions: []
-                        });
-                    }
-                    // black
-                    else if(col === 1){
-                        let newBoard = this.state.board.map(row => row.slice());
-                        newBoard[7][2] = -Logics.ROOK;
-                        newBoard[7][1] = -Logics.KING;
-                        newBoard[7][0] = Logics.EMPTY;
-                        newBoard[7][3] = Logics.EMPTY;
-                        this.setState({
-                            board: newBoard,
-                            activePosition: [-1, -1],
-                            eligiblePositions: []
-                        });
-                    }
+                    this.kingsideCastle(col)
                 }
                 else if(this.state.eligiblePositions[i] === Logics.QUEENSIDE_CASTLE){
                     // white
-                    if(col === 2){
-                        let newBoard = this.state.board.map(row => row.slice());
-                        newBoard[7][3] = Logics.ROOK;
-                        newBoard[7][2] = Logics.KING;
-                        newBoard[7][4] = Logics.EMPTY;
-                        newBoard[7][0] = Logics.EMPTY;
-                        this.setState({
-                            board: newBoard,
-                            activePosition: [-1, -1],
-                            eligiblePositions: []
-                        });
-                    }
-                    // black
-                    else if(col === 5){
-                        let newBoard = this.state.board.map(row => row.slice());
-                        newBoard[7][4] = -Logics.ROOK;
-                        newBoard[7][5] = -Logics.KING;
-                        newBoard[7][3] = Logics.EMPTY;
-                        newBoard[7][7] = Logics.EMPTY;
-                        this.setState({
-                            board: newBoard,
-                            activePosition: [-1, -1],
-                            eligiblePositions: []
-                        });
-                    }
+                    this.queensideCastle(col)
                 }
 
                 else{
                     let eligibleRow = this.state.eligiblePositions[i][0];
                     let eligibleCol = this.state.eligiblePositions[i][1];
                     if(eligibleRow === row && eligibleCol === col){ 
+                        this.modifyCastlingCode()
+
                         let newBoard = this.state.board.map(row => row.slice());
 
                         newBoard[row][col] = newBoard[this.state.activePosition[0]][this.state.activePosition[1]];
@@ -197,6 +151,101 @@ export default class Chess extends React.Component{
                     }
                 }
             }
+        }
+    }
+
+    modifyCastlingCode() {
+        let start = this.state.activePosition
+        let newCastlingCode = this.state.castlingCode;
+        if (this.state.board[start[0]][start[1]] === Logics.KING) {
+            if (this.state.isWhite) {
+                newCastlingCode[0] = false;
+                newCastlingCode[1] = false;
+            }
+            else {
+                newCastlingCode[2] = false;
+                newCastlingCode[3] = false;
+            }
+        }
+
+        else if (this.state.board[start[0]][start[1]] === Logics.ROOK){
+            // bottom left rook has moved
+            if(start[0] === 7 && start[1] === 0){
+                if(this.state.isWhite){
+                    newCastlingCode[1] = false;
+                }
+                else{
+                    newCastlingCode[2] = false;
+                }
+            }
+            // bottom right rook has moved
+            else if(start[0] === 7 && start[1] === 7){
+                if(this.state.isWhite){
+                    newCastlingCode[0] = false;
+                }
+                else{
+                    newCastlingCode[3] = false;
+                }
+            }
+        }
+        this.setState({
+            castlingCode: newCastlingCode
+        });
+    }
+
+    queensideCastle(col) {
+        if (col === 2) {
+            let newBoard = this.state.board.map(row => row.slice())
+            newBoard[7][3] = Logics.ROOK
+            newBoard[7][2] = Logics.KING
+            newBoard[7][4] = Logics.EMPTY
+            newBoard[7][0] = Logics.EMPTY
+            this.setState({
+                board: newBoard,
+                activePosition: [-1, -1],
+                eligiblePositions: []
+            })
+        }
+        // black
+        else if (col === 5) {
+            let newBoard = this.state.board.map(row => row.slice())
+            newBoard[7][4] = -Logics.ROOK
+            newBoard[7][5] = -Logics.KING
+            newBoard[7][3] = Logics.EMPTY
+            newBoard[7][7] = Logics.EMPTY
+            this.setState({
+                board: newBoard,
+                activePosition: [-1, -1],
+                eligiblePositions: []
+            })
+        }
+    }
+
+    kingsideCastle(col) {
+        if (col === 6) {
+            let newBoard = this.state.board.map(row => row.slice())
+            newBoard[7][5] = Logics.ROOK
+            newBoard[7][6] = Logics.KING
+            newBoard[7][4] = Logics.EMPTY
+            newBoard[7][7] = Logics.EMPTY
+            this.setState({
+                board: newBoard,
+                activePosition: [-1, -1],
+                eligiblePositions: []
+            })
+        }
+        // black
+        else if (col === 1) {
+            let newBoard = this.state.board.map(row => row.slice())
+            newBoard[7][2] = -Logics.ROOK
+            newBoard[7][1] = -Logics.KING
+            newBoard[7][0] = Logics.EMPTY
+            newBoard[7][3] = Logics.EMPTY
+            this.setState({
+                board: newBoard,
+                activePosition: [-1, -1],
+                eligiblePositions: []
+            })
         }
     }
 
