@@ -92,6 +92,7 @@ class Chat extends React.Component {
         }
         this.handleNameChange = this.handleNameChange.bind(this);
         this.handleMessageChange = this.handleMessageChange.bind(this);
+        this.enterPressed = this.enterPressed.bind(this);
     }
 
     handleNameChange(event){
@@ -106,8 +107,16 @@ class Chat extends React.Component {
         });
     }
 
+    enterPressed(event){
+        let key = event.key;
+        if(key === 'Enter'){
+            submitMessage(this.state.name, this.state.message);
+        }
+    }
+
     componentDidMount(){
         getAllMessages();
+        submitMessage(this.state.name, this.state.message);
     }
 
     render() {
@@ -125,7 +134,8 @@ class Chat extends React.Component {
                 <div className="row">
                     <textarea id='chat-name'  onChange={this.handleNameChange} className="col-md-2 rounded shadow" placeholder="Name" rows="1"/>
                     <div className="col-md-1"/>
-                    <textarea id='chat-message' onChange={this.handleMessageChange} className="col-md-5 rounded shadow" rows="3" />
+                    <textarea id='chat-message' onChange={this.handleMessageChange} onKeyPress={this.enterPressed.bind(this)} 
+                        className="col-md-5 rounded shadow" rows="3" />
                 </div>
                 <br />
                 <div className="row">

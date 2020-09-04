@@ -37,7 +37,6 @@ const readAllChatInstances = async () => {
 }
 
 const deleteAllChatInstances = async () => {
-    console.log("\n\nHERE\n\n");
     try{
         return await Chat.deleteMany({});
     }

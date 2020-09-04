@@ -1,5 +1,6 @@
 import React from 'react'
 import '../Stylesheets/Chess.css'
+
 import blackPawn from '../Images/Chess/blackPawn.png'
 import whitePawn from '../Images/Chess/whitePawn.png'
 import blackKnight from '../Images/Chess/blackKnight.png'
@@ -12,6 +13,8 @@ import blackQueen from '../Images/Chess/blackQueen.png'
 import whiteQueen from '../Images/Chess/whiteQueen.png'
 import blackKing from '../Images/Chess/blackKing.png'
 import whiteKing from '../Images/Chess/whiteKing.png'
+
+import * as Logics from './ChessLogics'
 
 /**
  * board[row][col] 
@@ -33,39 +36,33 @@ import whiteKing from '../Images/Chess/whiteKing.png'
  * 
  * 
  * The board will contain these pieces. White pieces will always be positive, while black pieces will be negative. 
- * Ex: PAWN = white pawn, -QUEEN = black queen, -BISHOP = black bishop, KING = white king, etc...
+ * Ex: Logics.PAWN = white pawn, -Logics.QUEEN = black queen, -Logics.BISHOP = black bishop, Logics.KING = white king, etc...
  * 
- * EMPTY (0) means there is no pieces at this area.
+ * Logics.EMPTY (0) means there is no pieces at this area.
  */
 
-const EMPTY = 0;
-const PAWN = 1;
-const KNIGHT = 2;
-const BISHOP = 3;
-const ROOK = 4;
-const QUEEN = 5;
-const KING = 6;
 
 export default class Chess extends React.Component{
     constructor(props){
         super(props);
 
         this.state = {
-            board: [
-                [-ROOK, -KNIGHT, -BISHOP, -QUEEN, -KING, -BISHOP ,-KNIGHT, -QUEEN],
-                [-PAWN, -PAWN, -PAWN, -PAWN, -PAWN, -PAWN, -PAWN, -PAWN],
-                [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY], 
-                [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY], 
-                [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY], 
-                [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY], 
-                [PAWN, PAWN, PAWN, PAWN, PAWN, PAWN, PAWN, PAWN],
-                [ROOK, KNIGHT, BISHOP, QUEEN, KING, BISHOP ,KNIGHT, QUEEN]
-            ],
+            board: Logics.startPosition,
+            isWhite: true,
             activePosition: [-1, -1],
-            eligiblePositions: []
+            eligiblePositions: [],
+
+            // the castling codes represents whether the king can castle. It represents castling at:
+            // [white kingside, white queenside, black kingside, black queenside]
+            castlingCode: [true, true, true, true], 
+
+            // The position where a pawn just moved two spaces - the en passant move can be made to remove a pawn at this position.
+            enPassantPos: [-1, -1]
         }
 
         this.renderPiece = this.renderPiece.bind(this);
+        this.handleTileClick = this.handleTileClick.bind(this);
+        this.switchTeams = this.switchTeams.bind(this);
     }
 
     renderPiece(row, col){
@@ -73,46 +70,134 @@ export default class Chess extends React.Component{
         let src;
 
         switch(piece){
-            case PAWN:
+            case Logics.PAWN:
                 src = whitePawn;
                 break;
-            case -PAWN:
+            case -Logics.PAWN:
                 src = blackPawn;
                 break;
-            case KNIGHT:
+            case Logics.KNIGHT:
                 src = whiteKnight;
                 break;
-            case -KNIGHT: 
+            case -Logics.KNIGHT: 
                 src = blackKnight;
                 break;
-            case BISHOP:
+            case Logics.BISHOP:
                 src =whiteBishop;
                 break;
-            case -BISHOP:
+            case -Logics.BISHOP:
                 src = blackBishop;
                 break;
-            case ROOK: 
+            case Logics.ROOK: 
                 src = whiteRook;
                 break;
-            case -ROOK:
+            case -Logics.ROOK:
                 src = blackRook;
                 break;
-            case QUEEN:
+            case Logics.QUEEN:
                 src = whiteQueen;
                 break;
-            case -QUEEN:
+            case -Logics.QUEEN:
                 src = blackQueen;
                 break;
-            case KING:
+            case Logics.KING:
                 src = whiteKing;
                 break;
-            case -KING:
+            case -Logics.KING:
                 src = blackKing;
                 break;
             default:
                 return <div></div>;
         }
         return <img src={src} className="pieceImg"/>;
+    }
+
+    handleTileClick(row, col){
+        if(Logics.positionContainsUserPiece(row, col, this.state.isWhite, this.state.board)){
+            this.setState({
+                activePosition: [row, col],
+                eligiblePositions: Logics.getEligiblePositions(row, col, this.state.board, this.state.castlingCode, this.state.enPassantPos)
+            });
+        }
+        else{
+            for(let i = 0; i < this.state.eligiblePositions.length; i++){
+                if(this.state.eligiblePositions[i] === Logics.KINGSIDE_CASTLE){
+                    // white
+                    if(col === 6){
+                        let newBoard = this.state.board.map(row => row.slice());
+                        newBoard[7][5] = Logics.ROOK;
+                        newBoard[7][6] = Logics.KING;
+                        newBoard[7][4] = Logics.EMPTY;
+                        newBoard[7][7] = Logics.EMPTY;
+                        this.setState({
+                            board: newBoard,
+                            activePosition: [-1, -1],
+                            eligiblePositions: []
+                        });
+                    }
+                    // black
+                    else if(col === 1){
+                        let newBoard = this.state.board.map(row => row.slice());
+                        newBoard[7][2] = -Logics.ROOK;
+                        newBoard[7][1] = -Logics.KING;
+                        newBoard[7][0] = Logics.EMPTY;
+                        newBoard[7][3] = Logics.EMPTY;
+                        this.setState({
+                            board: newBoard,
+                            activePosition: [-1, -1],
+                            eligiblePositions: []
+                        });
+                    }
+                }
+                else if(this.state.eligiblePositions[i] === Logics.QUEENSIDE_CASTLE){
+                    // white
+                    if(col === 2){
+                        let newBoard = this.state.board.map(row => row.slice());
+                        newBoard[7][3] = Logics.ROOK;
+                        newBoard[7][2] = Logics.KING;
+                        newBoard[7][4] = Logics.EMPTY;
+                        newBoard[7][0] = Logics.EMPTY;
+                        this.setState({
+                            board: newBoard,
+                            activePosition: [-1, -1],
+                            eligiblePositions: []
+                        });
+                    }
+                    // black
+                    else if(col === 5){
+                        let newBoard = this.state.board.map(row => row.slice());
+                        newBoard[7][4] = -Logics.ROOK;
+                        newBoard[7][5] = -Logics.KING;
+                        newBoard[7][3] = Logics.EMPTY;
+                        newBoard[7][7] = Logics.EMPTY;
+                        this.setState({
+                            board: newBoard,
+                            activePosition: [-1, -1],
+                            eligiblePositions: []
+                        });
+                    }
+                }
+
+                else{
+                    let eligibleRow = this.state.eligiblePositions[i][0];
+                    let eligibleCol = this.state.eligiblePositions[i][1];
+                    if(eligibleRow === row && eligibleCol === col){ 
+                        let newBoard = this.state.board.map(row => row.slice());
+
+                        newBoard[row][col] = newBoard[this.state.activePosition[0]][this.state.activePosition[1]];
+                        newBoard[this.state.activePosition[0]][this.state.activePosition[1]] = Logics.EMPTY;
+
+                        this.setState({
+                            board: newBoard,
+                            activePosition: [-1, -1],
+                            eligiblePositions: []
+                        });
+
+                    break;
+                    }
+                }
+            }
+        }
     }
 
     renderBoard(){
@@ -122,12 +207,9 @@ export default class Chess extends React.Component{
             let rowElements = [];
             for(let col = 0; col < 8; col++){
                 let element;
-                if(lightBg){
-                    element = <div className="tile lightBg">{this.renderPiece(row, col)}</div>
-                }
-                else{
-                    element = <div className="tile darkBg">{this.renderPiece(row, col)}</div>
-                }
+                let tileColor = lightBg ? 'lightBg' : 'darkBg';
+
+                element = <div onClick={e => this.handleTileClick(row, col)} className={'tile ' + tileColor}>{this.renderPiece(row, col)}</div>
                 
                 rowElements = [...rowElements, element]
                 lightBg = !lightBg;
@@ -138,11 +220,27 @@ export default class Chess extends React.Component{
         return rows;
     }
 
+    switchTeams(){
+        let newBoard = [];
+        for(let i = 7; i >= 0; i--){
+            newBoard.push(this.state.board[i].slice().reverse());
+        }
+        this.setState({
+            board: newBoard,
+            isWhite: !this.state.isWhite
+        });
+    }
+
     render() {
         return (
-            <div className="row justify-content-center">
-                <div id='board'>
-                    {this.renderBoard()}
+            <div>
+                <div className="row justify-content-center">
+                    <div id='board'>
+                        {this.renderBoard()}
+                    </div>
+                </div>
+                <div className="row justify-content-center">
+                    <button className="btn btn-light" onClick={this.switchTeams}>Switch teams</button>
                 </div>
             </div>
         );
