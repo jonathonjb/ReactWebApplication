@@ -9,7 +9,7 @@ const pollSchema = mongoose.Schema({
 
 const Poll = mongoose.model("Polls", pollSchema);
 
-const mongoUri = "mongodb+srv://jonathonjb2015:mongodatabasepasswordsilvermacbrowntable@cluster0.jbwx0.mongodb.net/cluster0?retryWrites=true&w=majority";
+const mongoUri = process.env.MONGO_URI;
 mongoose.connect(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true });
 
 const createPollInstance = async (question, choices) => {

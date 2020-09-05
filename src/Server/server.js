@@ -124,6 +124,17 @@ app.post('/polls/submit', jsonParser, (req, res) => {
     });
 });
 
+app.post('/chess/send', jsonParser, (req, res) => {
+    let data = req.body;
+
+    let board = data.board;
+    let isWhite = !data.userIsWhite;
+    let castlingCode = data.castlingCode;
+    let advancedPawnPos = data.advancedPawnPos;
+
+
+    res.send(null);
+});
 
 
 
@@ -132,5 +143,6 @@ app.post('/polls/submit', jsonParser, (req, res) => {
 
 
 
-app.listen(process.env.PORT || 3001);
-console.log("\nNode.js server is up and running.");
+
+app.listen(3001);
+console.log("\nNode.js server is up and running at PORT: 3001");

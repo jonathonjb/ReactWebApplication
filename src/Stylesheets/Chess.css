@@ -24,3 +24,17 @@
     display: flex;
     flex-wrap: wrap;
 }
+
+@media screen and (max-width: 575px) {
+    .tile, .pieceImg {
+        height: 2.5em;
+        width: 2.5em;
+    }
+}
+
+@media screen and (max-width: 350px) {
+    .tile, .pieceImg {
+        height: 2em;
+        width: 2em;
+    }
+}

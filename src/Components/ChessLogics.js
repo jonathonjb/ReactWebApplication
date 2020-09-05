@@ -9,6 +9,8 @@ export const KING = 6;
 export const KINGSIDE_CASTLE = 10;
 export const QUEENSIDE_CASTLE = 11;
 
+// isWhite ALWAYS refers to the user's color. Never the color of the AI / opponent.
+
 export const startPosition = [
     [-ROOK, -KNIGHT, -BISHOP, -QUEEN, -KING, -BISHOP ,-KNIGHT, -ROOK],
     [-PAWN, -PAWN, -PAWN, -PAWN, -PAWN, -PAWN, -PAWN, -PAWN],
@@ -25,7 +27,7 @@ export const getEligiblePositions = (row, col, board, castlingCodes, enPassantPo
     let eligiblePositions = [];
     switch(Math.abs(piece)){
         case PAWN:
-            eligiblePositions = getPawnEligiblePositions(row, col, board);
+            eligiblePositions = getPawnEligiblePositions(row, col, board, enPassantPos);
             break;
         case KNIGHT:
             eligiblePositions = getKnightEligiblePositions(row, col, board);
@@ -48,13 +50,13 @@ export const getEligiblePositions = (row, col, board, castlingCodes, enPassantPo
     return eligiblePositions;
 }
 
-const getPawnEligiblePositions = (row, col, board) => {
+const getPawnEligiblePositions = (row, col, board, enPassantPos) => {
     let piece = board[row][col];
     // checks if piece is actually a pawn
 
     let eligiblePositions = [];
     let isWhite = piece > 0;
-    let forward = -1;
+    let forward = isWhite ? -1 : 1;
 
     let nextRow = row + forward;
     if(inBound(nextRow, col) && !positionContainsPiece(nextRow, col, board)){
@@ -65,10 +67,13 @@ const getPawnEligiblePositions = (row, col, board) => {
         if(inBound(nextRow, nextCol) && positionContainsEnemyPiece(nextRow, nextCol, isWhite, board)){
             eligiblePositions.push([nextRow, nextCol]);
         }
+        else if(enPassantPos[0] === row && enPassantPos[1] === nextCol && positionContainsEnemyPiece(row, nextCol, isWhite, board)){
+            eligiblePositions.push([nextRow, nextCol]);
+        }
     }
 
     nextRow = row + (forward * 2);
-    if(row === 6 && !positionContainsPiece(row + forward, col, board) && !positionContainsPiece(nextRow, col, board)){
+    if((isWhite ? row === 6 : row === 1) && !positionContainsPiece(row + forward, col, board) && !positionContainsPiece(nextRow, col, board)){
         eligiblePositions.push([nextRow, col]);
     }
 
@@ -187,7 +192,7 @@ const getKingEligiblePositions = (row, col, board, castlingCodes) => {
         eligiblePositions.push(KINGSIDE_CASTLE);
     }
     // black
-    else if(!isWhite && castlingCodes[2] && !positionContainsPiece(7, 1, board) && !positionContainsPiece(7, 2, board)){
+    else if(!isWhite && castlingCodes[2] && !positionContainsPiece(0, 5, board) && !positionContainsPiece(0, 6, board)){
         eligiblePositions.push(KINGSIDE_CASTLE);
     }
 
@@ -198,8 +203,8 @@ const getKingEligiblePositions = (row, col, board, castlingCodes) => {
         eligiblePositions.push(QUEENSIDE_CASTLE);
     }
     // black
-    else if(!isWhite && castlingCodes[3] && !positionContainsPiece(7, 6, board) && !positionContainsPiece(7, 5, board) &&
-                !positionContainsPiece(7, 4, board)){
+    else if(!isWhite && castlingCodes[3] && !positionContainsPiece(0, 1, board) && !positionContainsPiece(0, 2, board) &&
+                !positionContainsPiece(0, 3, board)){
         eligiblePositions.push(QUEENSIDE_CASTLE);
     }
 
@@ -210,7 +215,7 @@ const inBound = (row, col) => {
     return row >= 0 && row < 8 && col >= 0 && col < 8;
 }
 
-const positionContainsPiece = (row, col, board) => {
+export const positionContainsPiece = (row, col, board) => {
     return board[row][col] !== EMPTY;
 }
 
@@ -222,10 +227,71 @@ export const positionContainsUserPiece = (row, col, userIsWhite, board) => {
     return userIsWhite ? board[row][col] > 0 : board[row][col] < 0;
 }
 
-const checkIfKingIsChecked = (color, board) => {
-
+export const getIfPinned = (row, col, isWhite, numOfchecks, board) => {
+    let tempBoard = board.map(row => row.slice());
+    tempBoard[row][col] = EMPTY;
+    return getNumOfChecks(isWhite, tempBoard) > numOfchecks;
 }
 
-export const getFlippedBoardPosition = (row, col) => {
-    return [Math.abs(row - 7), Math.abs(col - 7)];
+export const getNumOfChecks = (isWhite, board) => {
+    let kingPos = getKingPosition(isWhite, board);
+    let numOfChecks = 0;
+
+    // check if there are any knight checks
+    let moves = [[-1, -2], [-2, -1], [-2, 1], [1, -2], [-1, 2], [2, -1], [1, 2], [2, 1]];
+    moves.forEach(move => {
+        let newRow = kingPos[0] + move[0];
+        let newCol = kingPos[1] + move[1];
+        if(inBound(newRow, newCol) && (isWhite ? board[newRow][newCol] === -KNIGHT : board[newRow][newCol] === KNIGHT)){
+            numOfChecks++;
+        }
+    });
+
+    // check if there are any bishops or queen in the diagonals
+    let forwards = [[-1, -1], [-1, 1], [1, -1], [1, 1]];
+    forwards.forEach(move => {
+        let newRow = kingPos[0];
+        let newCol = kingPos[1];
+        while(true){
+            newRow += move[0];
+            newCol += move[1];
+            if(!inBound(newRow, newCol) || positionContainsUserPiece(newRow, newCol, isWhite, board)){
+                break;
+            }
+            else if(Math.abs(board[newRow][newCol]) === BISHOP || Math.abs(board[newRow][newCol]) === QUEEN){
+                numOfChecks++;
+            }
+        }
+    });
+
+    // check if there are any bishops or queen in the straight lines
+    forwards = [[-1, 0], [1, 0], [0, -1], [0, 1]];
+    forwards.forEach(move => {
+        let newRow = kingPos[0];
+        let newCol = kingPos[1];
+        while(true){
+            newRow += move[0];
+            newCol += move[1];
+            if(!inBound(newRow, newCol) || positionContainsUserPiece(newRow, newCol, isWhite, board)){
+                break;
+            }
+            else if(Math.abs(board[newRow][newCol]) === ROOK || Math.abs(board[newRow][newCol]) === QUEEN){
+                numOfChecks++;
+            }
+        }
+    });
+
+    return numOfChecks;
+}
+
+export const getKingPosition = (isWhite, board) => {
+    for(let row = 0; row < 8; row++){
+        for(let col = 0; col < 8; col++){
+            let piece = board[row][col];
+            if(Math.abs(piece) === KING && (isWhite ? piece > 0 : piece < 0)){
+                return [row, col];
+            }
+        }
+    }
+    console.error("King not found on the board");
 }

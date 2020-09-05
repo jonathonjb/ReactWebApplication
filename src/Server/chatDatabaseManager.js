@@ -8,9 +8,8 @@ const chatSchema = mongoose.Schema({
 
 const Chat = mongoose.model("Chat", chatSchema);
 
-const mongoUri = "mongodb+srv://jonathonjb2015:mongodatabasepasswordsilvermacbrowntable@cluster0.jbwx0.mongodb.net/cluster0?retryWrites=true&w=majority";
+const mongoUri = process.env.MONGO_URI;
 mongoose.connect(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true });
-
 
 const createChatInstance = async (name, message) => {
     let instance = new Chat({

@@ -41,12 +41,14 @@ import * as Logics from './ChessLogics'
  * Logics.EMPTY (0) means there is no pieces at this area.
  */
 
+const xhr = new XMLHttpRequest();
 
 export default class Chess extends React.Component{
     constructor(props){
         super(props);
 
         this.state = {
+            usersTurn: false,
             board: Logics.startPosition,
             isWhite: true,
             activePosition: [-1, -1],
@@ -57,12 +59,17 @@ export default class Chess extends React.Component{
             castlingCode: [true, true, true, true], 
 
             // The position where a pawn just moved two spaces - the en passant move can be made to remove a pawn at this position.
-            enPassantPos: [-1, -1]
+            advancedPawnPos: [-1, -1]
         }
 
         this.renderPiece = this.renderPiece.bind(this);
         this.handleTileClick = this.handleTileClick.bind(this);
         this.switchTeams = this.switchTeams.bind(this);
+        this.getInfo = this.getInfo.bind(this);
+        this.startTurn = this.startTurn.bind(this);
+        this.endTurn = this.endTurn.bind(this);
+        this.componentDidMount = this.componentDidMount.bind(this);
+        this.sendCurrentStateToServer = this.sendCurrentStateToServer.bind(this);
     }
 
     renderPiece(row, col){
@@ -113,171 +120,272 @@ export default class Chess extends React.Component{
     }
 
     handleTileClick(row, col){
-        if(Logics.positionContainsUserPiece(row, col, this.state.isWhite, this.state.board)){
-            this.setState({
-                activePosition: [row, col],
-                eligiblePositions: Logics.getEligiblePositions(row, col, this.state.board, this.state.castlingCode, this.state.enPassantPos)
-            });
-        }
-        else{
-            for(let i = 0; i < this.state.eligiblePositions.length; i++){
-                if(this.state.eligiblePositions[i] === Logics.KINGSIDE_CASTLE){
-                    // white
-                    this.kingsideCastle(col)
-                }
-                else if(this.state.eligiblePositions[i] === Logics.QUEENSIDE_CASTLE){
-                    // white
-                    this.queensideCastle(col)
-                }
+        if(this.state.usersTurn){
+            if(Logics.positionContainsUserPiece(row, col, this.state.isWhite, this.state.board)){
+                this.setState({
+                    activePosition: [row, col],
+                    eligiblePositions: Logics.getEligiblePositions(row, col, this.state.board, this.state.castlingCode, this.state.advancedPawnPos)
+                });
+            }
+            else{
+                let moveMade = false;
+                for(let i = 0; i < this.state.eligiblePositions.length; i++){
+                    if(this.state.eligiblePositions[i] === Logics.KINGSIDE_CASTLE){
+                        // white
+                        if(this.kingsideCastle(col)){
+                            moveMade = true
+                            break;
+                        }
+                    }
+                    else if(this.state.eligiblePositions[i] === Logics.QUEENSIDE_CASTLE){
+                        // white
+                        if(this.queensideCastle(col)){
+                            moveMade = true;
+                            break;
+                        }
+                    }
 
-                else{
-                    let eligibleRow = this.state.eligiblePositions[i][0];
-                    let eligibleCol = this.state.eligiblePositions[i][1];
-                    if(eligibleRow === row && eligibleCol === col){ 
-                        this.modifyCastlingCode()
-
+                    else{
+                        let eligibleRow = this.state.eligiblePositions[i][0];
+                        let eligibleCol = this.state.eligiblePositions[i][1];
                         let newBoard = this.state.board.map(row => row.slice());
 
-                        newBoard[row][col] = newBoard[this.state.activePosition[0]][this.state.activePosition[1]];
-                        newBoard[this.state.activePosition[0]][this.state.activePosition[1]] = Logics.EMPTY;
+                        if(eligibleRow === row && eligibleCol === col){ 
+                            this.modifyCastlingCode() // modifies the castling codes [white ks, white qs, black ks, black qs] if king or rook moves
+                            this.checkIfEnPassantIsUsed(col, row, newBoard) // check if en passant move was used, if so, removes the enemy pawn
+                            this.modifyAdvancedPawnPos(row, col) // checks if pawn moved two spaces, if so, en passant may be used to attack this pawn
 
-                        this.setState({
-                            board: newBoard,
-                            activePosition: [-1, -1],
-                            eligiblePositions: []
-                        });
+                            newBoard[row][col] = newBoard[this.state.activePosition[0]][this.state.activePosition[1]];
+                            newBoard[this.state.activePosition[0]][this.state.activePosition[1]] = Logics.EMPTY;
 
-                    break;
+                            this.setState({
+                                board: newBoard
+                            });
+
+                            moveMade = true;
+                            break;
+                        }
                     }
                 }
+                if(moveMade){
+                    this.endTurn();
+                }
             }
+        }
+    }
+
+    checkIfEnPassantIsUsed(col, row, newBoard) {
+        let start = this.state.activePosition;
+        if(Math.abs(this.state.board[start[0]][start[1]]) === Logics.PAWN){
+            if (start[1] !== col && !Logics.positionContainsPiece(row, col, this.state.board)) {
+                newBoard[start[0]][col] = Logics.EMPTY
+            }
+        }
+    }
+
+    modifyAdvancedPawnPos(row, col) {
+        let start = this.state.activePosition
+        let advancedPawn = false
+        if (Math.abs(this.state.board[start[0]][start[1]]) === Logics.PAWN) {
+            if (Math.abs(row - start[0]) === 2) {
+                advancedPawn = true
+            }
+        }
+        if (advancedPawn) {
+            this.setState({
+                advancedPawnPos: [row, col]
+            })
+        }
+        else {
+            this.setState({
+                advancedPawnPos: [-1, -1]
+            })
         }
     }
 
     modifyCastlingCode() {
         let start = this.state.activePosition
         let newCastlingCode = this.state.castlingCode;
-        if (this.state.board[start[0]][start[1]] === Logics.KING) {
-            if (this.state.isWhite) {
-                newCastlingCode[0] = false;
-                newCastlingCode[1] = false;
-            }
-            else {
-                newCastlingCode[2] = false;
-                newCastlingCode[3] = false;
-            }
+        if (Math.abs(this.state.board[start[0]][start[1]]) === Logics.KING) {
+            this.modifyCastlingCodeKingMovement(newCastlingCode)
         }
 
-        else if (this.state.board[start[0]][start[1]] === Logics.ROOK){
+        else if (Math.abs(this.state.board[start[0]][start[1]]) === Logics.ROOK){
             // bottom left rook has moved
-            if(start[0] === 7 && start[1] === 0){
-                if(this.state.isWhite){
-                    newCastlingCode[1] = false;
-                }
-                else{
-                    newCastlingCode[2] = false;
-                }
-            }
-            // bottom right rook has moved
-            else if(start[0] === 7 && start[1] === 7){
-                if(this.state.isWhite){
-                    newCastlingCode[0] = false;
-                }
-                else{
-                    newCastlingCode[3] = false;
-                }
-            }
+            this.modifyCastlingCodeRookMovement(start, newCastlingCode)
         }
         this.setState({
             castlingCode: newCastlingCode
         });
     }
 
-    queensideCastle(col) {
-        if (col === 2) {
-            let newBoard = this.state.board.map(row => row.slice())
-            newBoard[7][3] = Logics.ROOK
-            newBoard[7][2] = Logics.KING
-            newBoard[7][4] = Logics.EMPTY
-            newBoard[7][0] = Logics.EMPTY
-            this.setState({
-                board: newBoard,
-                activePosition: [-1, -1],
-                eligiblePositions: []
-            })
+    modifyCastlingCodeRookMovement(start, newCastlingCode) {
+        let row = this.state.isWhite ? 7 : 0;
+        if (start[0] === row && start[1] === 0) {
+            if (this.state.isWhite) {
+                newCastlingCode[1] = false
+            }
+            else {
+                newCastlingCode[2] = false
+            }
         }
-        // black
-        else if (col === 5) {
-            let newBoard = this.state.board.map(row => row.slice())
-            newBoard[7][4] = -Logics.ROOK
-            newBoard[7][5] = -Logics.KING
-            newBoard[7][3] = Logics.EMPTY
-            newBoard[7][7] = Logics.EMPTY
-            this.setState({
-                board: newBoard,
-                activePosition: [-1, -1],
-                eligiblePositions: []
-            })
+        // bottom right rook has moved
+        else if (start[0] === row && start[1] === 7) {
+            if (this.state.isWhite) {
+                newCastlingCode[0] = false
+            }
+            else {
+                newCastlingCode[3] = false
+            }
         }
     }
 
+    modifyCastlingCodeKingMovement(newCastlingCode) {
+        if (this.state.isWhite) {
+            newCastlingCode[0] = false
+            newCastlingCode[1] = false
+        }
+        else {
+            newCastlingCode[2] = false
+            newCastlingCode[3] = false
+        }
+    }
+
+    queensideCastle(col) {
+        let row = this.state.isWhite ? 7 : 0;
+        let multiplier = this.state.isWhite ? 1 : -1;
+        if (col === 2) {
+            let newBoard = this.state.board.map(row => row.slice())
+            newBoard[row][3] = Logics.ROOK * multiplier;
+            newBoard[row][2] = Logics.KING * multiplier;
+            newBoard[row][4] = Logics.EMPTY * multiplier;
+            newBoard[row][0] = Logics.EMPTY * multiplier;
+            this.setState({
+                board: newBoard
+            })
+            return true;
+        }
+        return false;
+    }
+
     kingsideCastle(col) {
+        let row = this.state.isWhite ? 7 : 0;
+        let multiplier = this.state.isWhite ? 1 : -1;
         if (col === 6) {
-            let newBoard = this.state.board.map(row => row.slice())
-            newBoard[7][5] = Logics.ROOK
-            newBoard[7][6] = Logics.KING
-            newBoard[7][4] = Logics.EMPTY
-            newBoard[7][7] = Logics.EMPTY
+            let newBoard = this.state.board.map(row => row.slice());
+            newBoard[row][5] = Logics.ROOK * multiplier;
+            newBoard[row][6] = Logics.KING * multiplier;
+            newBoard[row][4] = Logics.EMPTY * multiplier;
+            newBoard[row][7] = Logics.EMPTY * multiplier;
             this.setState({
-                board: newBoard,
-                activePosition: [-1, -1],
-                eligiblePositions: []
+                board: newBoard
             })
+            return true;
         }
-        // black
-        else if (col === 1) {
-            let newBoard = this.state.board.map(row => row.slice())
-            newBoard[7][2] = -Logics.ROOK
-            newBoard[7][1] = -Logics.KING
-            newBoard[7][0] = Logics.EMPTY
-            newBoard[7][3] = Logics.EMPTY
-            this.setState({
-                board: newBoard,
-                activePosition: [-1, -1],
-                eligiblePositions: []
-            })
+        return false;
+    }
+
+    startTurn(){
+        this.setState({
+            usersTurn: true,
+            activePosition: [-1, -1],
+            eligiblePositions: []
+        });
+    }
+
+    endTurn(){
+        console.log('turn ends');
+        this.setState({
+            usersTurn: false,
+            activePosition: [-1, -1],
+            eligiblePositions: []
+        });
+
+        this.sendCurrentStateToServer();
+    }
+
+    sendCurrentStateToServer(){
+        console.log('SENDING TO SERVER...');
+        let url = '/chess/send';
+        xhr.open('POST', url, true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.onreadystatechange = () => {
+            if(xhr.readyState === 4 && xhr.status === 200){
+                console.log('RETREIVED RESPONSE FROM SERVER');
+            }
         }
+        xhr.send(JSON.stringify({
+            'board': this.state.board,
+            'userIsWhite': this.state.isWhite,
+            'castlingCode': this.state.castlingCode,
+            'advancedPawnPos': this.state.advancedPawnPos
+        }));
     }
 
     renderBoard(){
         let rows = [];
         let lightBg = true;
-        for(let row = 0; row < 8; row++){
-            let rowElements = [];
-            for(let col = 0; col < 8; col++){
-                let element;
-                let tileColor = lightBg ? 'lightBg' : 'darkBg';
 
-                element = <div onClick={e => this.handleTileClick(row, col)} className={'tile ' + tileColor}>{this.renderPiece(row, col)}</div>
-                
-                rowElements = [...rowElements, element]
+        if(this.state.isWhite){
+            for(let row = 0; row < 8; row++){
+                let rowElements = [];
+                for(let col = 0; col < 8; col++){
+                    let element;
+                    let tileColor = lightBg ? 'lightBg' : 'darkBg';
+
+                    element = <div onClick={e => this.handleTileClick(row, col)} className={'tile ' + tileColor}>{this.renderPiece(row, col)}</div>
+                    
+                    rowElements = [...rowElements, element]
+                    lightBg = !lightBg;
+                }
+                rows = [...rows, <div className="boardRow">{rowElements}</div>]
                 lightBg = !lightBg;
             }
-            rows = [...rows, <div className="boardRow">{rowElements}</div>]
-            lightBg = !lightBg;
         }
+        else{
+            for(let row = 7; row >= 0; row--){
+                let rowElements = [];
+                for(let col = 7; col >= 0; col--){
+                    let element;
+                    let tileColor = lightBg ? 'lightBg' : 'darkBg';
+
+                    element = <div onClick={e => this.handleTileClick(row, col)} className={'tile ' + tileColor}>{this.renderPiece(row, col)}</div>
+                    
+                    rowElements = [...rowElements, element]
+                    lightBg = !lightBg;
+                }
+                rows = [...rows, <div className="boardRow">{rowElements}</div>]
+                lightBg = !lightBg;
+            }
+        }   
         return rows;
     }
 
     switchTeams(){
-        let newBoard = [];
-        for(let i = 7; i >= 0; i--){
-            newBoard.push(this.state.board[i].slice().reverse());
-        }
         this.setState({
-            board: newBoard,
-            isWhite: !this.state.isWhite
+            isWhite: !this.state.isWhite,
+            activePosition: [-1, -1],
+            eligiblePositions: []
         });
+    }
+
+    getInfo(){
+        if(this.state.activePosition[0] !== -1){
+            console.log('active: ' + this.state.activePosition);
+            console.log('Pinned?: ' + Logics.getIfPinned(this.state.activePosition[0], this.state.activePosition[1], 
+                this.state.isWhite, Logics.getNumOfChecks(this.state.isWhite, this.state.board), this.state.board));
+        }
+        console.log('board:');
+        console.log(this.state.board);
+        console.log('en passant:');
+        console.log(this.state.advancedPawnPos);
+        console.log('number of checks: ');
+        console.log(Logics.getNumOfChecks(this.state.isWhite, this.state.board));
+        console.log('\n');
+    }
+
+    componentDidMount(){
+        this.startTurn();
     }
 
     render() {
@@ -290,6 +398,7 @@ export default class Chess extends React.Component{
                 </div>
                 <div className="row justify-content-center">
                     <button className="btn btn-light" onClick={this.switchTeams}>Switch teams</button>
+                    <button className="btn btn-light" onClick={this.getInfo}>Info</button>
                 </div>
             </div>
         );
