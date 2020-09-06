@@ -22,12 +22,12 @@ export const startPosition = [
     [ROOK, KNIGHT, BISHOP, QUEEN, KING, BISHOP ,KNIGHT, ROOK]
 ]
 
-export const getEligiblePositions = (row, col, board, castlingCodes, enPassantPos) => {
+export const getEligiblePositions = (row, col, board, castlingCodes, advancedPawnPos) => {
     let piece = board[row][col];
     let eligiblePositions = [];
     switch(Math.abs(piece)){
         case PAWN:
-            eligiblePositions = getPawnEligiblePositions(row, col, board, enPassantPos);
+            eligiblePositions = getPawnEligiblePositions(row, col, board, advancedPawnPos);
             break;
         case KNIGHT:
             eligiblePositions = getKnightEligiblePositions(row, col, board);
@@ -50,9 +50,8 @@ export const getEligiblePositions = (row, col, board, castlingCodes, enPassantPo
     return eligiblePositions;
 }
 
-const getPawnEligiblePositions = (row, col, board, enPassantPos) => {
+const getPawnEligiblePositions = (row, col, board, advancedPawnPos) => {
     let piece = board[row][col];
-    // checks if piece is actually a pawn
 
     let eligiblePositions = [];
     let isWhite = piece > 0;
@@ -67,7 +66,7 @@ const getPawnEligiblePositions = (row, col, board, enPassantPos) => {
         if(inBound(nextRow, nextCol) && positionContainsEnemyPiece(nextRow, nextCol, isWhite, board)){
             eligiblePositions.push([nextRow, nextCol]);
         }
-        else if(enPassantPos[0] === row && enPassantPos[1] === nextCol && positionContainsEnemyPiece(row, nextCol, isWhite, board)){
+        else if(advancedPawnPos[0] === row && advancedPawnPos[1] === nextCol && positionContainsEnemyPiece(row, nextCol, isWhite, board)){
             eligiblePositions.push([nextRow, nextCol]);
         }
     }
@@ -82,7 +81,6 @@ const getPawnEligiblePositions = (row, col, board, enPassantPos) => {
 
 const getKnightEligiblePositions = (row, col, board) => {
     let piece = board[row][col];
-    // checks if piece is actually a knight
 
     let eligiblePositions = [];
     let isWhite = piece > 0;
@@ -100,7 +98,6 @@ const getKnightEligiblePositions = (row, col, board) => {
 
 const getBishopEligiblePositions = (row, col, board) => {
     let piece = board[row][col];
-    // checks if piece is actually a bishop
 
     let eligiblePositions = [];
     let isWhite = piece > 0;
@@ -132,7 +129,6 @@ const getBishopEligiblePositions = (row, col, board) => {
 
 const getRookEligiblePositions = (row, col, board) => {
     let piece = board[row][col];
-    // checks if piece is actually a rook
 
     let eligiblePositions = [];
     let isWhite = piece > 0;
@@ -163,15 +159,11 @@ const getRookEligiblePositions = (row, col, board) => {
 }
 
 const getQueenEligiblePositions = (row, col, board) => {
-    let piece = board[row][col];
-    // checks if piece is actually a queen
-
     return getBishopEligiblePositions(row, col, board).concat(getRookEligiblePositions(row, col, board));
 }
 
 const getKingEligiblePositions = (row, col, board, castlingCodes) => {
     let piece = board[row][col];
-    // checks if piece is actually a bishop
 
     let eligiblePositions = [];
     let isWhite = piece > 0;

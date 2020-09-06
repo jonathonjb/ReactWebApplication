@@ -1,0 +1,7 @@
+#board {
+    border: 0.2em solid black;
+}
+
+.boardRow {
+    margin: 0;
+}

@@ -1,0 +1,79 @@
+#board {
+    border: 0.23em solid black;
+    padding: 0;
+}
+
+.tile, .pieceImg {
+    height: 4em;
+    width: 4em;
+}
+
+.pieceImg {
+    cursor: pointer;
+}
+
+.lightBg {
+    background-color: tan;
+}
+
+.darkBg {
+    background-color: brown;
+}
+
+.boardRow {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+#piecesBoard {
+    background-color: white;
+    border: 0.3em solid black;
+    position: absolute;
+    margin: auto;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+    top: 10em;
+}
+
+@media screen and (max-width: 575px) {
+    .tile, .pieceImg {
+        height: 2.5em;
+        width: 2.5em;
+    }
+
+    #piecesBoard {
+        top: 21.25em;
+    }
+}
+
+@media screen and (max-width: 350px) {
+    .tile, .pieceImg {
+        height: 2em;
+        width: 2em;
+    }
+    #piecesBoard {
+        top: 20em;
+    }
+}
+
+@media screen and (max-width: 265px) {
+    .tile, .pieceImg {
+        height: 1.5em;
+        width: 1.5em;
+    }
+
+    #piecesBoard {
+        top: 18.75em;
+    }
+}
+
+@media screen and (max-width: 200px) {
+    .tile, .pieceImg {
+        height: 1em;
+        width: 1em;
+    }
+
+    #piecesBoard {
+        top: 17.5em;
+    }
+}
