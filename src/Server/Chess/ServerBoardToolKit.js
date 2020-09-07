@@ -190,26 +190,47 @@ const isOpposingQueen = (color, position, board) => {
     console.error("The color is not correctly defined");
 }
 
+const isOpposingKing = (color, position, board) => {
+    if(!inBound(position)){
+        return false;
+    }
+    else if(color === Consts.WHITE){
+        return board[position] === Consts.BLACK_KING;
+    }
+    else if(color === Consts.BLACK){
+        return board[position] === Consts.WHITE_KING;
+    }
+    console.error("The color is not correctly defined");
+}
+
 const inBound = position => {
     return position >= 0 && position < 64;
 }
 
 module.exports = {
     printBoard,
+
     isTeamsKing,
     isTeamsQueen,
     isTeamsKnight,
     isTeamsPawn,
     isTeamsRook,
     isTeamsBishop,
+    
     pawnAtStartRow,
     forwardValue,
     checkIfOneSpaceMove,
     getOpposingColor,
     getKingPosition,
+
     isOpposingDiagonalSliderPiece,
     isOpposingStraightSliderPiece,
     isOpposingPawn,
+    isOpposingBishop,
     isOpposingKnight,
+    isOpposingRook,
+    isOpposingQueen,
+    isOpposingKing,
+
     positionStatus
 }

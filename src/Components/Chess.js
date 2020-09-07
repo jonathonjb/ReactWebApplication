@@ -60,7 +60,7 @@ class Chess extends React.Component {
         let newBoard = this.state.board.slice();
         newBoard[newPosition] = newBoard[this.state.activePosition];
         newBoard[this.state.activePosition] = Consts.NONE;
-        let newCastlingCodes = this.state.castlingCodes;
+        let newCastlingCodes = this.state.castlingCodes.slice();
         let newEnPassentPos = -1;
 
         this.addChangesIfMoveWasACastle(newPosition, newBoard, newCastlingCodes);
