@@ -8,7 +8,6 @@ class Tile extends React.Component {
             <div className={this.props.lightFlag ? 'lightBackground tile' : 'darkBackground tile'} 
                         onClick={e => this.props.onClickThrowback(this.props.index)}>
                 {this.props.piece !== undefined ? <Piece piece={this.props.piece} /> : ''}
-                {this.props.piece === undefined ? this.props.index : ''}
             </div>
         );
     }

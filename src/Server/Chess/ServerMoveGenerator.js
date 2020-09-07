@@ -1,7 +1,7 @@
-import * as BoardTk from './BoardToolKit';
-import * as Consts from './Constants';
+const BoardTk = require('./ServerBoardToolKit');
+const Consts = require('./ServerConstants');
 
-export const generateMoves = (color, board, castlingCodes, enPassantPos) => {
+const generateMoves = (color, board, castlingCodes, enPassantPos) => {
     let kingPosition = BoardTk.getKingPosition(color, board);
     let kingAttackers= getNumberOfTimesAttacked(color, kingPosition, board);
     let numOfChecks = kingAttackers[0];
@@ -82,6 +82,7 @@ const getNumberOfTimesAttacked = (color, position, board, removeKing=false, king
         }
     }
 
+    
     Consts.KNIGHT_MOVES.forEach(move => {
         let currPosition = position + move;
         if(BoardTk.checkIfOneSpaceMove(position, currPosition) && BoardTk.isOpposingKnight(color, currPosition, board)){
@@ -413,4 +414,8 @@ const addMoveIfValid = (move, moves, validSquares) => {
             moves.add(move);
         }
     }
+}
+
+module.exports = {
+    generateMoves
 }

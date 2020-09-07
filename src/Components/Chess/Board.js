@@ -6,22 +6,27 @@ import '../../Stylesheets/Chess/Board.css';
 class Board extends React.Component {
     renderTiles(){
         let arr = [];
-        let i = 0;
         let lightBackgroundFlag = true;
+
+        let i = 0;
+
+        let index = this.props.color === Consts.WHITE ? 63 : 0;
+        let increment = this.props.color === Consts.WHITE ? -1 : 1;
 
         while(i < 64){
             let currRow = [];
             do{
-                if(this.props.board[i] !== Consts.NONE){
-                    currRow.push( <Tile key={'tile' + i} lightFlag={lightBackgroundFlag} 
-                            onClickThrowback={this.props.onClickThrowback} index={i} piece={this.props.board[i]}/> );
+                if(this.props.board[index] !== Consts.NONE){
+                    currRow.push( <Tile key={'tile' + index} lightFlag={lightBackgroundFlag} 
+                            onClickThrowback={this.props.onClickThrowback} index={index} piece={this.props.board[index]}/> );
                 }
                 else{
-                    currRow.push( <Tile key={'tile' + i} onClickThrowback={this.props.onClickThrowback} index={i} 
+                    currRow.push( <Tile key={'tile' + index} onClickThrowback={this.props.onClickThrowback} index={index} 
                             lightFlag={lightBackgroundFlag}/> );
                 }
                 lightBackgroundFlag = !lightBackgroundFlag;
                 i++;
+                index += increment;
             }
             while(i % 8 !== 0);
 

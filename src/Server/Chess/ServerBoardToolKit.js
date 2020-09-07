@@ -1,6 +1,6 @@
-import * as Consts from './Constants';
+const Consts = require('./ServerConstants')
 
-export const positionStatus = (color, position, board) => {
+const positionStatus = (color, position, board) => {
     if(!inBound(position)){
         return Consts.STATUS_OUT_OF_BOUNDS;
     }
@@ -21,7 +21,7 @@ export const positionStatus = (color, position, board) => {
     else return Consts.STATUS_DIFF_COLOR;
 }
 
-export const isOpposingKnight = (color, position, board) => {
+const isOpposingKnight = (color, position, board) => {
     if(!inBound(position)){
         return false;
     }
@@ -34,19 +34,19 @@ export const isOpposingKnight = (color, position, board) => {
     console.error("The color is not correctly defined");
 }
 
-export const isOpposingDiagonalSliderPiece = (color, position, board) => {
+const isOpposingDiagonalSliderPiece = (color, position, board) => {
     return isOpposingBishop(color, position, board) || isOpposingQueen(color, position, board);
 }
 
-export const isOpposingStraightSliderPiece = (color, position, board) => {
+const isOpposingStraightSliderPiece = (color, position, board) => {
     return isOpposingRook(color, position, board) || isOpposingQueen(color, position, board);
 }
 
-export const isOpposingPawn = (color, position, board) => {
+const isOpposingPawn = (color, position, board) => {
     return color === Consts.WHITE ? board[position] === Consts.BLACK_PAWN : board[position] === Consts.WHITE_PAWN;
 }
 
-export const getKingPosition = (color, board) => {
+const getKingPosition = (color, board) => {
     let king = color === Consts.WHITE ? Consts.WHITE_KING : Consts.BLACK_KING;
     for(let i = 0; i < 64; i++){
         if(board[i] === king){
@@ -56,50 +56,50 @@ export const getKingPosition = (color, board) => {
     console.error('Cannot find king piece on the board.')
 }
 
-export const getOpposingColor = (color) => {
+const getOpposingColor = (color) => {
     return color === Consts.WHITE ? Consts.BLACK : Consts.WHITE;
 }
 
-export const checkIfOneSpaceMove = (startPosition, endPosition) => {
+const checkIfOneSpaceMove = (startPosition, endPosition) => {
     // the reason why I use '2' here instead of '1' is because while 2 spaces aren't technically 'one space moves', it represents a 
     //valid knight move. None of the invalid moves, which moves a piece across the board, contains a move which moves a piece across only
     //two columns, so this will work; it will only return true if the 'single' move is legal.
     return Math.abs((startPosition % 8) - (endPosition % 8)) <= 2;
 }
 
-export const forwardValue = (color) => {
+const forwardValue = (color) => {
     return color === Consts.WHITE ? 8 : -8;
 }
 
-export const pawnAtStartRow = (color, position) => {
+const pawnAtStartRow = (color, position) => {
     return color === Consts.WHITE ? position >= 8 && position < 16 : position >= 48 && position < 55;
 }
 
-export const isTeamsPawn = (color, position, board) => {
+const isTeamsPawn = (color, position, board) => {
     return color === Consts.WHITE ? board[position] === Consts.WHITE_PAWN : board[position] === Consts.BLACK_PAWN;
 }
 
-export const isTeamsBishop = (color, position, board) => {
+const isTeamsBishop = (color, position, board) => {
     return color === Consts.WHITE ? board[position] === Consts.WHITE_BISHOP : board[position] === Consts.BLACK_BISHOP;
 }
 
-export const isTeamsKnight = (color, position, board) => {
+const isTeamsKnight = (color, position, board) => {
     return color === Consts.WHITE ? board[position] === Consts.WHITE_KNIGHT : board[position] === Consts.BLACK_KNIGHT;
 }
 
-export const isTeamsRook = (color, position, board) => {
+const isTeamsRook = (color, position, board) => {
     return color === Consts.WHITE ? board[position] === Consts.WHITE_ROOK : board[position] === Consts.BLACK_ROOK;
 }
 
-export const isTeamsQueen = (color, position, board) => {
+const isTeamsQueen = (color, position, board) => {
     return color === Consts.WHITE ? board[position] === Consts.WHITE_QUEEN : board[position] === Consts.BLACK_QUEEN;
 }
 
-export const isTeamsKing = (color, position, board) => {
+const isTeamsKing = (color, position, board) => {
     return color === Consts.WHITE ? board[position] === Consts.WHITE_KING : board[position] === Consts.BLACK_KING;
 }
 
-export const printBoard = (board) => {
+const printBoard = (board) => {
     let i = 0; 
     for(let row = 0; row < 8; row++){
         let rowString = []
@@ -192,4 +192,24 @@ const isOpposingQueen = (color, position, board) => {
 
 const inBound = position => {
     return position >= 0 && position < 64;
+}
+
+module.exports = {
+    printBoard,
+    isTeamsKing,
+    isTeamsQueen,
+    isTeamsKnight,
+    isTeamsPawn,
+    isTeamsRook,
+    isTeamsBishop,
+    pawnAtStartRow,
+    forwardValue,
+    checkIfOneSpaceMove,
+    getOpposingColor,
+    getKingPosition,
+    isOpposingDiagonalSliderPiece,
+    isOpposingStraightSliderPiece,
+    isOpposingPawn,
+    isOpposingKnight,
+    positionStatus
 }

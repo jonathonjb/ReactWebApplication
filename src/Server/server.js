@@ -4,6 +4,7 @@ const path = require("path");
 const pino = require('express-pino-logger')();
 const { createChatInstance, readAllChatInstances, deleteAllChatInstances } = require("./chatDatabaseManager");
 const { createPollInstance, getAllPollInstances, deleteAllPollInstances, getPollInstace, saveUpdatedPollInstance } = require("./pollDatabaseManager");
+const { makeMove } = require("./Chess/chessAi");
 
 const app = express();
 const jsonParser = bodyParser.json();
@@ -122,6 +123,22 @@ app.post('/polls/submit', jsonParser, (req, res) => {
             res.send(JSON.stringify({"status": "success", "data": data}));
         });
     });
+});
+
+app.post('/chess/send', jsonParser, (req, res) => {
+    let data = req.body;
+    let board = data.board;
+    let color = data.aiColor;
+    let castlingCodes = data.castlingCodes;
+    let enPassantPos = data.enPassantPos;
+
+    makeMove(color, board, castlingCodes, enPassantPos);
+
+    res.send(JSON.stringify({
+        'board': board,
+        'castlingCodes': castlingCodes,
+        'enPassantPos': enPassantPos
+    }));
 });
 
 
