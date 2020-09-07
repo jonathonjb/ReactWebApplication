@@ -31,6 +31,37 @@ export const START_POS = [
     BLACK_ROOK, BLACK_KNIGHT, BLACK_BISHOP, BLACK_KING, BLACK_QUEEN, BLACK_BISHOP, BLACK_KNIGHT, BLACK_ROOK
 ]
 
+export const START_CASTLING_CODE = [true, true, true, true];
+
+export const TEST_POS = [
+    NONE, NONE, NONE, NONE, WHITE_KING, NONE, NONE, NONE, 
+    NONE, NONE, NONE, NONE, NONE, NONE, BLACK_KNIGHT, NONE,
+    NONE, NONE, NONE, NONE, NONE, WHITE_BISHOP, NONE, NONE,
+    NONE, NONE, NONE, NONE, BLACK_ROOK, NONE, NONE, NONE,
+    NONE, NONE, NONE, NONE, NONE, NONE, NONE, NONE,
+    NONE, NONE, NONE, NONE, NONE, NONE, NONE, NONE,
+    NONE, NONE, NONE, NONE, NONE, NONE, NONE, NONE,
+    NONE, NONE, NONE, NONE, NONE, NONE, NONE, NONE
+]
+
+export const TEST_CASTLING_CODE = [false, false, false, false];
+
+export const NORTH = 8;
+export const NORTHWEST = 7;
+export const NORTHEAST = 9;
+export const EAST = -1;
+export const WEST = 1;
+export const SOUTHWEST = -9;
+export const SOUTH = -8;
+export const SOUTHEAST = -7;
+
 export const KNIGHT_MOVES = [-17, -15, -10, -6, 6, 10, 15, 17];
-export const STRAIGHT_SLIDERS = [-8, -1, 1, 8];
-export const DIAGONAL_SLIDERS = [-9, -7, 7, 9];
+
+// The reason why we need to keep them in this order is because when checking for pins, we move the king slider using the opposite move
+// as the opposing piece slider. Ex: Sliding piece goes NORTH, King goes SOUTH. If they both end up at the same piece, that 
+// piece is pinned. The piece loops from start to last, while the king loops from last to start
+
+export const STRAIGHT_SLIDERS = [SOUTH, WEST, EAST, NORTH]; // KEEP IT IN THIS ORDER
+export const DIAGONAL_SLIDERS = [SOUTHWEST, SOUTHEAST, NORTHWEST, NORTHEAST]; // KEEP IT IN THIS ORDER
+
+export const KING_MOVES = [NORTH, NORTHWEST, NORTHEAST, EAST, WEST, SOUTHWEST, SOUTH, SOUTHEAST];

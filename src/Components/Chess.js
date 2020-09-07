@@ -11,7 +11,9 @@ class Chess extends React.Component {
         super(props);
 
         this.state = {
-            board: Consts.START_POS
+            board: Consts.TEST_POS,
+            castlingCode: Consts.TEST_CASTLING_CODE,
+            enPassantPos: -1
         }
 
         this.onClick = this.onClick.bind(this);
@@ -24,7 +26,7 @@ class Chess extends React.Component {
     }
 
     componentDidMount(){
-        generateMoves(Consts.WHITE, this.state.board);
+        generateMoves(Consts.WHITE, this.state.board, this.state.castlingCode, this.state.enPassantPos);
     }
 
     render(){

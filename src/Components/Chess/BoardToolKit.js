@@ -1,6 +1,6 @@
 import * as Consts from './Constants';
 
-export const positionStatus = (position, color, board) => {
+export const positionStatus = (color, position, board) => {
     if(!inBound(position)){
         return Consts.STATUS_OUT_OF_BOUNDS;
     }
@@ -21,7 +21,7 @@ export const positionStatus = (position, color, board) => {
     else return Consts.STATUS_DIFF_COLOR;
 }
 
-export const isOpposingKnight = (position, color, board) => {
+export const isOpposingKnight = (color, position, board) => {
     if(!inBound(position)){
         return false;
     }
@@ -34,12 +34,12 @@ export const isOpposingKnight = (position, color, board) => {
     console.error("The color is not correctly defined");
 }
 
-export const isOpposingDiagonalSliderPiece = (position, color, board) => {
-    return isOpposingBishop(position, color, board) || isOpposingQueen(position, color, board);
+export const isOpposingDiagonalSliderPiece = (color, position, board) => {
+    return isOpposingBishop(color, position, board) || isOpposingQueen(color, position, board);
 }
 
-export const isOpposingStraightSliderPiece = (position, color, board) => {
-    return isOpposingRook(position, color, board) || isOpposingQueen(position, color, board);
+export const isOpposingStraightSliderPiece = (color, position, board) => {
+    return isOpposingRook(color, position, board) || isOpposingQueen(color, position, board);
 }
 
 export const getKingPosition = (color, board) => {
@@ -52,10 +52,51 @@ export const getKingPosition = (color, board) => {
     console.error('Cannot find king piece on the board.')
 }
 
+export const getOpposingColor = (color) => {
+    return color === Consts.WHITE ? Consts.BLACK : Consts.WHITE;
+}
+
+export const checkIfOneSpaceMove = (startPosition, endPosition) => {
+    // the reason why I use '2' here instead of '1' is because while 2 spaces aren't technically 'one space moves', it represents a 
+    //valid knight move. None of the invalid moves, which moves a piece across the board, contains a move which moves a piece across only
+    //two columns, so this will work; it will only return true if the 'single' move is legal.
+    return Math.abs((startPosition % 8) - (endPosition % 8)) <= 2;
+}
+
+export const forwardValue = (color) => {
+    return color === Consts.WHITE ? 8 : -8;
+}
+
+export const pawnAtStartRow = (color, position) => {
+    return color === Consts.WHITE ? position >= 8 && position < 16 : position >= 48 && position < 55;
+}
+
+export const isTeamsPawn = (color, position, board) => {
+    return color === Consts.WHITE ? board[position] === Consts.WHITE_PAWN : board[position] === Consts.BLACK_PAWN;
+}
+
+export const isTeamsBishop = (color, position, board) => {
+    return color === Consts.WHITE ? board[position] === Consts.WHITE_BISHOP : board[position] === Consts.BLACK_BISHOP;
+}
+
+export const isTeamsKnight = (color, position, board) => {
+    return color === Consts.WHITE ? board[position] === Consts.WHITE_KNIGHT : board[position] === Consts.BLACK_KNIGHT;
+}
+
+export const isTeamsRook = (color, position, board) => {
+    return color === Consts.WHITE ? board[position] === Consts.WHITE_ROOK : board[position] === Consts.BLACK_ROOK;
+}
+
+export const isTeamsQueen = (color, position, board) => {
+    return color === Consts.WHITE ? board[position] === Consts.WHITE_QUEEN : board[position] === Consts.BLACK_QUEEN;
+}
+
+export const isTeamsKing = (color, position, board) => {
+    return color === Consts.WHITE ? board[position] === Consts.WHITE_KING : board[position] === Consts.BLACK_KING;
+}
 
 
-
-const isOpposingBishop = (position, color, board) => {
+const isOpposingBishop = (color, position, board) => {
     if(!inBound(position)){
         return false;
     }
@@ -68,7 +109,7 @@ const isOpposingBishop = (position, color, board) => {
     console.error("The color is not correctly defined");
 }
 
-const isOpposingRook = (position, color, board) => {
+const isOpposingRook = (color, position, board) => {
     if(!inBound(position)){
         return false;
     }
@@ -81,7 +122,7 @@ const isOpposingRook = (position, color, board) => {
     console.error("The color is not correctly defined");
 }
 
-const isOpposingQueen = (position, color, board) => {
+const isOpposingQueen = (color, position, board) => {
     if(!inBound(position)){
         return false;
     }
