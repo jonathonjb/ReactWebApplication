@@ -4,6 +4,23 @@ import * as Consts from './Constants';
 import '../../Stylesheets/Chess/Board.css';
 
 class Board extends React.Component {
+    lightUpTile(activePosition, currPosition, moves){
+        if(activePosition === currPosition){
+            return true;
+        }
+        else if(moves === null){
+            return false;
+        }
+        else if(moves.has(activePosition)){
+            let activePositionMoves = moves.get(activePosition);
+            if(activePositionMoves.has(currPosition)){
+                console.log('hit');
+                return true;
+            }
+        }
+        return false;
+    }
+
     renderTiles(){
         let arr = [];
         let lightBackgroundFlag = true;
@@ -18,11 +35,13 @@ class Board extends React.Component {
             do{
                 if(this.props.board[index] !== Consts.NONE){
                     currRow.push( <Tile key={'tile' + index} lightFlag={lightBackgroundFlag} 
+                            overlay={this.lightUpTile(this.props.activePosition, index, this.props.moves)} 
                             onClickThrowback={this.props.onClickThrowback} index={index} piece={this.props.board[index]}/> );
                 }
                 else{
                     currRow.push( <Tile key={'tile' + index} onClickThrowback={this.props.onClickThrowback} index={index} 
-                            lightFlag={lightBackgroundFlag}/> );
+                        overlay={this.lightUpTile(this.props.activePosition, index, this.props.moves)}
+                        lightFlag={lightBackgroundFlag}/> );
                 }
                 lightBackgroundFlag = !lightBackgroundFlag;
                 i++;

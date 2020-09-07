@@ -5,6 +5,7 @@ import * as Consts from './Chess/Constants';
 import * as BoardTk from './Chess/BoardToolKit'
 import '../Stylesheets/Chess/Chess.css'
 import { generateMoves } from './Chess/MoveGenerator';
+import Piece from './Chess/Piece';
 
 const xhr = new XMLHttpRequest();
 
@@ -20,7 +21,9 @@ class Chess extends React.Component {
 
             moves: null,
 
-            activePosition: -1
+            activePosition: -1,
+
+            currTurn: false
         }
 
         this.onClick = this.onClick.bind(this);
@@ -33,15 +36,17 @@ class Chess extends React.Component {
     }
 
     onClick(index) {
-        let status = BoardTk.positionStatus(this.state.color, index, this.state.board);
-        if(status === Consts.STATUS_SAME_COLOR){
-            this.setState({
-                activePosition: index
-            });
-        }
-        else if(this.state.activePosition >= 0){
-            if(this.checkIfMoveIsValid(index)){
-                this.moveOnBoard(index);
+        if(this.state.currTurn){
+            let status = BoardTk.positionStatus(this.state.color, index, this.state.board);
+            if(status === Consts.STATUS_SAME_COLOR){
+                this.setState({
+                    activePosition: index
+                });
+            }
+            else if(this.state.activePosition >= 0){
+                if(this.checkIfMoveIsValid(index)){
+                    this.moveOnBoard(index);
+                }
             }
         }
     }
@@ -150,12 +155,17 @@ class Chess extends React.Component {
 
     startTurn(){
         this.setState({
-            moves: generateMoves(this.state.color, this.state.board, this.state.castlingCodes, this.state.enPassantPos)
+            moves: generateMoves(this.state.color, this.state.board, this.state.castlingCodes, this.state.enPassantPos),
+            currTurn: true
         });
     }
 
     endTurn(){
-        this.sendCurrentStateToServer();
+        this.setState({
+            currTurn: false
+        }, () => {
+            this.sendCurrentStateToServer();
+        });
     }
 
     sendCurrentStateToServer(){
@@ -198,10 +208,21 @@ class Chess extends React.Component {
     }
 
     switchTeams(){
-        let newColor = this.state.color === Consts.WHITE ? Consts.BLACK : Consts.WHITE;
-        this.setState({
-            color: newColor
-        }, () => this.endTurn());
+        if(this.state.currTurn){
+            let newColor = this.state.color === Consts.WHITE ? Consts.BLACK : Consts.WHITE;
+            this.setState({
+                color: newColor
+            }, () => this.endTurn());
+        }
+    }
+
+    checkIfTurn(color){
+        if(this.state.color === color){
+            return this.state.currTurn;
+        }
+        else{
+            return !this.state.currTurn;
+        }
     }
 
     componentDidMount(){
@@ -212,7 +233,12 @@ class Chess extends React.Component {
         return (
             <div>
                 <div className="row justify-content-center">
-                    <Board board={this.state.board} color={this.state.color} onClickThrowback={this.onClick}/>
+                    <Piece piece={Consts.WHITE_KING} opacity={this.checkIfTurn(Consts.WHITE) ? '1' : '0.3'}/>
+                    <Piece piece={Consts.BLACK_KING} opacity={this.checkIfTurn(Consts.BLACK) ? '1' : '0.3'}/>
+                </div>
+                <div className="row justify-content-center">
+                    <Board board={this.state.board} color={this.state.color} onClickThrowback={this.onClick} 
+                        activePosition={this.state.activePosition} moves={this.state.moves}/>
                 </div>
                 <br />
                 <div className="row justify-content-center">

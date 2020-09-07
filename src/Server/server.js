@@ -132,12 +132,12 @@ app.post('/chess/send', jsonParser, (req, res) => {
     let castlingCodes = data.castlingCodes;
     let enPassantPos = data.enPassantPos;
 
-    let result = makeMove(color, board, castlingCodes, enPassantPos);
+    let newState = makeMove(color, board, castlingCodes, enPassantPos);
 
     res.send(JSON.stringify({
-        'board': result[0],
-        'castlingCodes': result[1],
-        'enPassantPos': result[2]
+        'board': newState[0],
+        'castlingCodes': newState[1],
+        'enPassantPos': newState[2]
     }));
 });
 

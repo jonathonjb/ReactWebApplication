@@ -10,3 +10,9 @@
 .darkBackground {
     background-color: saddlebrown;
 }
+
+#overlay {
+    background-color: hsla(61, 100%, 52%, 0.274);
+    width: 100%;
+    height: 100%;
+}

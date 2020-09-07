@@ -68,8 +68,11 @@ const evaluate = (aiColor, board) => {
                         1 * (aiPawns - oppPawns);
     
     let pawnStructureScore = evaluatePawnStructure(aiColor, board);
-    let mobilityScore = evaluateMobility(aiColor, board);
-    return numPiecesScore + pawnStructureScore + mobilityScore;
+
+    //let mobilityScore = evaluateMobility(aiColor, board); // removed this because calculating all of the moves for every single node
+    // is absolutely TERRIBLE for the engine's efficiency. 
+
+    return numPiecesScore + pawnStructureScore;
 }
 
 const evaluatePawnStructure = (aiColor, board) => {

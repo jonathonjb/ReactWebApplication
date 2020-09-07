@@ -57,7 +57,7 @@ class Piece extends React.Component {
     render() {
         return (
             <div>
-                <img className="imgPiece" alt='piece' src={this.getImageSource()} />
+                <img className="imgPiece" alt='piece' src={this.getImageSource()} style={{'opacity': this.props.opacity}} />
             </div>
         );
     }
