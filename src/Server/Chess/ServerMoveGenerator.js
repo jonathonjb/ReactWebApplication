@@ -265,8 +265,8 @@ const generatePawnMoves = (color, pawnPosition, board, validSquares, enPassantPo
         if(status === Consts.STATUS_DIFF_COLOR || nextPosition === enPassantPos){
             addMoveIfValid(nextPosition, moves, validSquares);
         }
+        nextPosition++;
     }
-    nextPosition++;
     if(BoardTk.checkIfOneSpaceMove(nextPosition, nextPosition + 1)){
         nextPosition = nextPosition + 1;
         status = BoardTk.positionStatus(color, nextPosition, board);
