@@ -14,7 +14,6 @@ class Board extends React.Component {
         else if(moves.has(activePosition)){
             let activePositionMoves = moves.get(activePosition);
             if(activePositionMoves.has(currPosition)){
-                console.log('hit');
                 return true;
             }
         }

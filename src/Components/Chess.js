@@ -15,7 +15,7 @@ class Chess extends React.Component {
 
         this.state = {
             color: Consts.WHITE,
-            board: Consts.START_POS,
+            board: Consts.TEST_POS,
             castlingCodes: Consts.START_CASTLING_CODE,
             enPassantPos: -1,
 
