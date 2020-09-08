@@ -15,15 +15,14 @@ class Chess extends React.Component {
 
         this.state = {
             color: Consts.WHITE,
-            board: Consts.TEST_POS,
+            board: Consts.START_POS,
             castlingCodes: Consts.START_CASTLING_CODE,
             enPassantPos: -1,
 
             moves: null,
-
             activePosition: -1,
-
-            currTurn: false
+            currTurn: false,
+            recentMove: null
         }
 
         this.onClick = this.onClick.bind(this);
@@ -38,7 +37,12 @@ class Chess extends React.Component {
     onClick(index) {
         if(this.state.currTurn){
             let status = BoardTk.positionStatus(this.state.color, index, this.state.board);
-            if(status === Consts.STATUS_SAME_COLOR){
+            if(index === this.state.activePosition){
+                this.setState({
+                    activePosition: -1
+                });
+            }
+            else if(status === Consts.STATUS_SAME_COLOR){
                 this.setState({
                     activePosition: index
                 });
@@ -46,6 +50,11 @@ class Chess extends React.Component {
             else if(this.state.activePosition >= 0){
                 if(this.checkIfMoveIsValid(index)){
                     this.moveOnBoard(index);
+                }
+                else{
+                    this.setState({
+                        activePosition: -1
+                    });
                 }
             }
         }
@@ -78,11 +87,14 @@ class Chess extends React.Component {
             }
         }
 
+        let recentMove = [this.state.activePosition, newPosition];
+
         this.setState({
             board: newBoard,
             activePosition: -1,
             castlingCodes: newCastlingCodes,
-            enPassantPos: newEnPassentPos
+            enPassantPos: newEnPassentPos,
+            recentMove: recentMove
         }, () => this.endTurn());
     }
 
@@ -178,7 +190,8 @@ class Chess extends React.Component {
                 this.setState({
                     board: data.board,
                     castlingCodes: data.castlingCodes,
-                    enPassantPos: data.enPassantPos
+                    enPassantPos: data.enPassantPos,
+                    recentMove: [data.positionOne, data.positionTwo]
                 }, () => this.startTurn());
             }
         }
@@ -238,7 +251,7 @@ class Chess extends React.Component {
                 </div>
                 <div className="row justify-content-center">
                     <Board board={this.state.board} color={this.state.color} onClickThrowback={this.onClick} 
-                        activePosition={this.state.activePosition} moves={this.state.moves}/>
+                        activePosition={this.state.activePosition} moves={this.state.moves} recentMove={this.state.recentMove}/>
                 </div>
                 <br />
                 <div className="row justify-content-center">

@@ -4,8 +4,8 @@ import * as Consts from './Constants';
 import '../../Stylesheets/Chess/Board.css';
 
 class Board extends React.Component {
-    lightUpTile(activePosition, currPosition, moves){
-        if(activePosition === currPosition){
+    lightUpTile(activePosition, currPosition, moves, recentMove){
+        if((recentMove != null && (currPosition === recentMove[0] || currPosition === recentMove[1])) || activePosition === currPosition){
             return true;
         }
         else if(moves === null){
@@ -34,12 +34,12 @@ class Board extends React.Component {
             do{
                 if(this.props.board[index] !== Consts.NONE){
                     currRow.push( <Tile key={'tile' + index} lightFlag={lightBackgroundFlag} 
-                            overlay={this.lightUpTile(this.props.activePosition, index, this.props.moves)} 
+                            overlay={this.lightUpTile(this.props.activePosition, index, this.props.moves, this.props.recentMove)} 
                             onClickThrowback={this.props.onClickThrowback} index={index} piece={this.props.board[index]}/> );
                 }
                 else{
                     currRow.push( <Tile key={'tile' + index} onClickThrowback={this.props.onClickThrowback} index={index} 
-                        overlay={this.lightUpTile(this.props.activePosition, index, this.props.moves)}
+                        overlay={this.lightUpTile(this.props.activePosition, index, this.props.moves, this.props.recentMove)}
                         lightFlag={lightBackgroundFlag}/> );
                 }
                 lightBackgroundFlag = !lightBackgroundFlag;

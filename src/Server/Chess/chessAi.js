@@ -46,7 +46,7 @@ const makeMove = (color, board, castleCodes, enPassantPos) => {
     console.timeEnd('minimax');
     console.log('total number of nodes: ' + nodes);
     nodes = 0;
-    return executeMoveOnNewBoard(color, board, castleCodes, enPassantPos, result[1][0], result[1][1]);
+    return [result[1][0], result[1][1], executeMoveOnNewBoard(color, board, castleCodes, enPassantPos, result[1][0], result[1][1])];
 }
 
 const minimax = (aiColor, board, castleCodes, enPassantPos, depth, alpha=Number.NEGATIVE_INFINITY, beta=Number.POSITIVE_INFINITY) => {
