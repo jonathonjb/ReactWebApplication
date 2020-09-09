@@ -149,7 +149,8 @@ app.post('/chess/send', jsonParser, (req, res) => {
         'castlingCodes': newState[1],
         'enPassantPos': newState[2],
         'positionOne': positionOne,
-        'positionTwo': positionTwo
+        'positionTwo': positionTwo,
+        'checkmate': false
     }));
 });
 
