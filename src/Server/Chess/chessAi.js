@@ -4,7 +4,7 @@ let MoveGenerator = require('./ServerMoveGenerator');
 const { evaluate } = require('./evaluation');
 const { generateMoves } = require('./ServerMoveGenerator');
 
-const DEPTH_LIMIT = 4; // number of half-turns checked; total turns checked is DEPTH_LIMIT + 1 / 2
+const DEPTH_LIMIT = 4; // number of half-turns checked; total turns checked is (DEPTH_LIMIT + 1) / 2
 let nodes = 0;
 
 const makeDumbMove = (color, board, castleCodes, enPassantPos) => {
@@ -46,6 +46,9 @@ const makeMove = (color, board, castleCodes, enPassantPos) => {
     console.timeEnd('minimax');
     console.log('total number of nodes: ' + nodes);
     nodes = 0;
+    if(result[1] === null){
+        return 'checkmated';
+    }
     return [result[1][0], result[1][1], executeMoveOnNewBoard(color, board, castleCodes, enPassantPos, result[1][0], result[1][1])];
 }
 
@@ -101,7 +104,73 @@ const minimax = (aiColor, board, castleCodes, enPassantPos, depth, alpha=Number.
 const executeMoveOnNewBoard = (color, board, castleCodes, enPassantPos, startPosition, endPosition) => {
     let newBoard = board.slice();
     let newCastleCodes = castleCodes.slice(); 
-    let newEnPassantPos = enPassantPos;
+    let newEnPassantPos = -1;
+
+    // handles en passant moves
+    if(BoardTk.isTeamsPawn(color, startPosition, board)){
+        let forward = BoardTk.forwardValue(color);
+        if(endPosition === enPassantPos){
+            newBoard[endPosition - forward] = Consts.NONE;
+        }
+        if(startPosition + (2 * forward) === endPosition){
+            newEnPassantPos = startPosition + forward;
+        }
+    }
+
+    // handles castling moves
+    if(BoardTk.isTeamsKing(color, startPosition, board) && Math.abs(startPosition - endPosition) === 2){
+        // white kingside castle 
+        if (endPosition === 1) {
+            newBoard[0] = Consts.NONE;
+            newBoard[2] = Consts.WHITE_ROOK;
+        }
+        // white queenside castle
+        else if (endPosition === 5) {
+            newBoard[7] = Consts.NONE;
+            newBoard[4] = Consts.WHITE_ROOK;
+        }
+        // black kingside castle
+        else if (endPosition === 57) {
+            newBoard[56] = Consts.NONE;
+            newBoard[58] = Consts.BLACK_ROOK;
+        }
+        else if (endPosition === 61) {
+            newBoard[63] = Consts.NONE;
+            newBoard[60] = Consts.BLACK_ROOK;
+        }
+    }
+
+    // modifies castling codes
+    if (BoardTk.isTeamsRook(color, startPosition, board)) {
+            // modify castlingCodes if user moved peviously unmoved rook
+            // white kingside rook
+            if (newCastleCodes[0] === true && startPosition === 0) {
+                newCastleCodes[0] = false;
+            }
+            // white queenside rook
+            else if (newCastleCodes[1] === true && startPosition === 7) {
+                newCastleCodes[1] = false;
+            }
+            // black kingside rook
+            else if (newCastleCodes[2] === true && startPosition === 56) {
+                newCastleCodes[2] = false;
+            }
+            // black queenside rook
+            else if (newCastleCodes[3] === true && startPosition === 63) {
+                newCastleCodes[3] = false;
+            }
+        }
+        else if (BoardTk.isTeamsKing(color, startPosition, board)) {
+            if (color === Consts.WHITE) {
+                newCastleCodes[0] = false;
+                newCastleCodes[1] = false;
+            }
+            else if (color === Consts.BLACK) {
+                newCastleCodes[2] = false;
+                newCastleCodes[3] = false;
+            }
+        }
+    
 
     newBoard[endPosition] = newBoard[startPosition];
     newBoard[startPosition] = Consts.NONE;

@@ -134,6 +134,12 @@ app.post('/chess/send', jsonParser, (req, res) => {
 
     let result = makeMove(color, board, castlingCodes, enPassantPos);
 
+    if(result === 'checkmated'){
+        res.send(JSON.stringify({
+            'checkmate': true
+        }));
+    }
+
     let positionOne = result[0];
     let positionTwo = result[1];
     let newState = result[2];

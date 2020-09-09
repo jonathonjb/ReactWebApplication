@@ -22,7 +22,10 @@ class Chess extends React.Component {
             moves: null,
             activePosition: -1,
             currTurn: false,
-            recentMove: null
+            recentMove: null,
+            turnOffAi: false,
+            checkmate: false,
+            message: ''
         }
 
         this.onClick = this.onClick.bind(this);
@@ -44,7 +47,8 @@ class Chess extends React.Component {
             }
             else if(status === Consts.STATUS_SAME_COLOR){
                 this.setState({
-                    activePosition: index
+                    activePosition: index,
+                    recentMove: null
                 });
             }
             else if(this.state.activePosition >= 0){
@@ -165,10 +169,28 @@ class Chess extends React.Component {
         }
     }
 
+    checkIfCheckmated(){
+        let moves = 0;
+        this.state.moves.forEach((endPositions, startPosition) => {
+            moves += endPositions.size;
+        });
+        if(moves === 0){
+            return true;
+        }
+        return false;
+    }
+
     startTurn(){
         this.setState({
             moves: generateMoves(this.state.color, this.state.board, this.state.castlingCodes, this.state.enPassantPos),
             currTurn: true
+        }, () => {
+            if(this.checkIfCheckmated()){
+                this.setState({
+                    checkmate: true,
+                    message: 'THE AI WON BY CHECKMATE'
+                });
+            }
         });
     }
 
@@ -176,7 +198,12 @@ class Chess extends React.Component {
         this.setState({
             currTurn: false
         }, () => {
-            this.sendCurrentStateToServer();
+            if(!this.state.turnOffAi){
+                this.sendCurrentStateToServer();
+            }
+            else{
+                this.startTurn();
+            }
         });
     }
 
@@ -187,12 +214,20 @@ class Chess extends React.Component {
         xhr.onreadystatechange = () => {
             if(xhr.readyState === 4 && xhr.status === 200){
                 let data = JSON.parse(xhr.responseText);
-                this.setState({
-                    board: data.board,
-                    castlingCodes: data.castlingCodes,
-                    enPassantPos: data.enPassantPos,
-                    recentMove: [data.positionOne, data.positionTwo]
-                }, () => this.startTurn());
+                if(data.checkmate){
+                    this.setState({
+                        checkmate: true,
+                        message: 'YOU WON BY CHECKMATE'
+                    });
+                }
+                else{
+                    this.setState({
+                        board: data.board,
+                        castlingCodes: data.castlingCodes,
+                        enPassantPos: data.enPassantPos,
+                        recentMove: [data.positionOne, data.positionTwo]
+                    }, () => this.startTurn());
+                }
             }
         }
         xhr.send(JSON.stringify({
@@ -245,6 +280,9 @@ class Chess extends React.Component {
     render(){
         return (
             <div>
+                <div className="row justify-content-center">
+                    <h1 style={{'display': this.state.checkmate ? 'flex' : 'none'}}>{this.state.message}</h1>
+                </div>
                 <div className="row justify-content-center">
                     <Piece piece={Consts.WHITE_KING} opacity={this.checkIfTurn(Consts.WHITE) ? '1' : '0.3'}/>
                     <Piece piece={Consts.BLACK_KING} opacity={this.checkIfTurn(Consts.BLACK) ? '1' : '0.3'}/>
