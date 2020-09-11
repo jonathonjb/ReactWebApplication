@@ -13,8 +13,11 @@ import LanguageClassifier from './Projects/LanguageClassifier';
 import PathFinder from './Projects/PathFinder';
 import Zombies from './Projects/Zombies';
 import Chat from './Chat';
+import NewChat from './NewChat';
 import Polls from './Polls';
 import Resume from './Resume';
+import LogIn from './LogIn';
+import SignUp from './SignUp';
 
 function App() {
   return (
@@ -28,8 +31,11 @@ function App() {
           <Route path='/projects/path_finder' component={PathFinder} />
           <Route path='/projects/zombies' component={Zombies} />
           <Route path='/chat' component={Chat} />
+          <Route path='/newchat' component={NewChat} />
           <Route path='/polls' component={Polls} />
           <Route path='/resume' component={Resume} />
+          <Route path='/login' component={LogIn} />
+          <Route path='/signup' component={SignUp} />
           <Route component={Error} />
         </Switch>
       </div>

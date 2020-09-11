@@ -1,5 +1,3 @@
-import { ROOK, BISHOP } from "../OldChess/ChessLogics";
-
 export const NONE = 'a';
 export const WHITE_PAWN = 'b';
 export const WHITE_KNIGHT = 'c';

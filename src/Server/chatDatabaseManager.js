@@ -1,17 +1,5 @@
-const mongoose = require("mongoose");
 
-const chatSchema = mongoose.Schema({
-    name: {type: String, required: true},
-    message: {type: String, required: true},
-    date: {type: Date, default: Date.now}
-});
-
-const Chat = mongoose.model("Chat", chatSchema);
-
-const mongoUri = process.env.MONGO_URI;
-mongoose.connect(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true });
-
-const createChatInstance = async (name, message) => {
+const createChatInstance = async (Chat, name, message) => {
     let instance = new Chat({
         name: name,
         message: message
@@ -26,7 +14,7 @@ const createChatInstance = async (name, message) => {
     }
 }
 
-const readAllChatInstances = async () => {
+const readAllChatInstances = async (Chat) => {
     try{
         return await Chat.find({});
     }
@@ -35,21 +23,13 @@ const readAllChatInstances = async () => {
     }
 }
 
-const deleteAllChatInstances = async () => {
+const deleteAllChatInstances = async (Chat) => {
     try{
         return await Chat.deleteMany({});
     }
     catch(error){
         return false;
     }
-}
-
-const updateChatInstance = (instance) => {
-    // TODO figure out what to search for (id, name, etc...) and finish this function
-}
-
-const deleteChatInstance = (id) => {
-    // TODO figure out what to search for (id, name, etc...) and finish this function
 }
 
 module.exports = {

@@ -270,7 +270,7 @@ export default class Chess extends React.Component{
         $('#piecesBox').css('display', 'none');
         $('input[name=pawnPiece]:checked').prop('checked', false);
 
-        this.modifyAdvancedPawnPos(, col) // checks if pawn moved two spaces, if so, en passant may be used to attack this pawn
+        this.modifyAdvancedPawnPos(row, col) // checks if pawn moved two spaces, if so, en passant may be used to attack this pawn
         this.setState({
             activePosition: [-1, -1]
         });

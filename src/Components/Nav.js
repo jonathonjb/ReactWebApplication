@@ -52,12 +52,21 @@ class Nav extends React.Component {
                     </li>
 
                     <li className="nav-item">
+                    <Link to='/newchat' className="nav-link" id='newchat' onClick={this.changeActive}>New Chat</Link>
+                    </li>
+
+                    <li className="nav-item">
                     <Link to='/polls' className="nav-link" id='polls' onClick={this.changeActive}>Polls</Link>
                     </li>
 
                     <li className="nav-item">
                     <Link to='/resume' className="nav-link" id='resume' onClick={this.changeActive}>Resume</Link>
                     </li>
+
+                    <li className="nav-item">
+                    <Link to='/login' className="nav-link" id='login' onClick={this.changeActive}>Log-In</Link>
+                    </li>
+                    
                 </ul>
             </nav>
         );

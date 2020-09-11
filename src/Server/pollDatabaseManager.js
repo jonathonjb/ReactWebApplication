@@ -1,18 +1,4 @@
-const mongoose = require("mongoose");
-
-const pollSchema = mongoose.Schema({
-    question: {type: String, required: true},
-    choices: {type: [String], required: true},
-    votes: {type: [Number], required: true},
-    datePosted: {type: Date, default: Date.now}
-});
-
-const Poll = mongoose.model("Polls", pollSchema);
-
-const mongoUri = process.env.MONGO_URI;
-mongoose.connect(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true });
-
-const createPollInstance = async (question, choices) => {
+const createPollInstance = async (Poll, question, choices) => {
     let votes = [];
     for(let i = 0; i < choices.length; i++){
         votes.push(0);
@@ -30,7 +16,7 @@ const createPollInstance = async (question, choices) => {
     }
 }
 
-const getPollInstace = async (id) => {
+const getPollInstace = async (Poll, id) => {
     console.log("ID: " + id);
     try{
         return await Poll.find({"_id": id});
@@ -40,7 +26,7 @@ const getPollInstace = async (id) => {
     }
 }
 
-const saveUpdatedPollInstance = async (updatedInstance) => {
+const saveUpdatedPollInstance = async (Poll, updatedInstance) => {
     try{
         return await Poll.findByIdAndUpdate(updatedInstance._id, {"votes": updatedInstance.votes}, {new: true});
     }
@@ -49,7 +35,7 @@ const saveUpdatedPollInstance = async (updatedInstance) => {
     }
 }
 
-const getAllPollInstances = async () => {
+const getAllPollInstances = async (Poll) => {
     try{
         return await Poll.find({});
     }
@@ -58,7 +44,7 @@ const getAllPollInstances = async () => {
     }
 }
 
-const deleteAllPollInstances = async () => {
+const deleteAllPollInstances = async (Poll) => {
     try{
         return await Poll.deleteMany({});
     }
