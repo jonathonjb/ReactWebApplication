@@ -40,7 +40,7 @@ class SignUp extends React.Component {
             return;
         }
 
-        let url = '/signup/submit';
+        let url = '/register';
         xhr.open('POST', url, true);
         xhr.setRequestHeader('Content-Type', 'application/json');
         xhr.onreadystatechange = () => {
@@ -50,6 +50,9 @@ class SignUp extends React.Component {
                     this.setState({
                         redirect: '/newchat'
                     });
+                }
+                else{
+                    console.log(data.message);
                 }
             }
         }

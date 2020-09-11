@@ -66,7 +66,7 @@ class Login extends React.Component {
                 </div>
                 <br /> 
                 <div className='row justify-content-center'>
-                    <Link to='/signup'>Or sign-up!</Link>
+                    <Link to='/register'>Or sign-up!</Link>
                 </div>
             </div>
         );

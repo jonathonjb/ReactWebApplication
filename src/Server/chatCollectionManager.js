@@ -33,7 +33,7 @@ const deleteAllChatInstances = async (Chat) => {
 }
 
 module.exports = {
-    createChatInstance: createChatInstance,
-    readAllChatInstances: readAllChatInstances,
-    deleteAllChatInstances: deleteAllChatInstances
+    createChatInstance,
+    readAllChatInstances,
+    deleteAllChatInstances
 }

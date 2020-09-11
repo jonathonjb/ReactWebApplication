@@ -1,16 +1,16 @@
-const { createChatInstance, readAllChatInstances, deleteAllChatInstances } = require("./chatDatabaseManager");
-const { createPollInstance, getAllPollInstances, deleteAllPollInstances, getPollInstace, saveUpdatedPollInstance } = require("./pollDatabaseManager");
+const { createChatInstance, readAllChatInstances, deleteAllChatInstances } = require("./chatCollectionManager");
+const { createPollInstance, getAllPollInstances, deleteAllPollInstances, getPollInstace, saveUpdatedPollInstance } = require("./pollCollectionManager");
+const { addUser, findUserFromUsername } = require("./userCollectionManager");
 const { makeMove } = require("./Chess/chessAi");
 const bcrypt = require('bcrypt');
 const bodyParser = require("body-parser");
-const passport = require('passport');
 const session = require('express-session');
 
 const jsonParser = bodyParser.json();
 const urlencodedParser = bodyParser.urlencoded({extended: false});
 
-module.exports = (app, ChatModel, PollModel) => {
-// authentication middleware
+module.exports = (app, UserModel, ChatModel, PollModel) => {
+    // authentication middleware
     function authenticate(req, res, next) {
         passport.authenticate('local', (err, user, info) => {
             if(err){
@@ -29,8 +29,24 @@ module.exports = (app, ChatModel, PollModel) => {
         res.sendFile(path.join(__dirname, "../../build", "index.html"));
     });
 
-    app.post('/register', jsonParser, (req, res) => {
-
+    app.post('/register', jsonParser, async (req, res) => {
+        let data = req.body;
+        let hashedPassword = await bcrypt.hash(data.password, 10);
+        findUserFromUsername(UserModel, data.username).then(result => {
+            if(result === null){
+                addUser(UserModel, data.username, hashedPassword).then(additionResult => {
+                    if(additionResult !== null){
+                        res.send({'status': 'success'});
+                    }
+                    else{
+                        res.send({'status': 'failure', 'message': 'Problem adding your account to the database.'});
+                    }
+                });
+            }
+            else{
+                res.send({'status': 'failure', 'message': 'The username already exists.'});
+            }
+        });
     });
 
     app.post('/chat/message_submit', jsonParser, (req, res) => {

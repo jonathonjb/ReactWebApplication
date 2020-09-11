@@ -54,9 +54,9 @@ const deleteAllPollInstances = async (Poll) => {
 }
 
 module.exports = {
-    createPollInstance: createPollInstance,
-    getAllPollInstances: getAllPollInstances,
-    deleteAllPollInstances: deleteAllPollInstances,
-    getPollInstace: getPollInstace,
-    saveUpdatedPollInstance: saveUpdatedPollInstance
+    createPollInstance,
+    getAllPollInstances,
+    deleteAllPollInstances,
+    getPollInstace,
+    saveUpdatedPollInstance
 }

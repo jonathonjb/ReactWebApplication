@@ -17,6 +17,10 @@ mongoose.connect(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true });
 
 
 
+const userSchema = mongoose.Schema({
+    username: {type: String, required: true},
+    password: {type: String, required: true} // only stores the hashed passwords in plaintext, not the original passwords
+});
 const chatSchema = mongoose.Schema({
     name: {type: String, required: true},
     message: {type: String, required: true},
@@ -28,13 +32,14 @@ const pollSchema = mongoose.Schema({
     votes: {type: [Number], required: true},
     datePosted: {type: Date, default: Date.now}
 });
+const UserModel = mongoose.model("User", userSchema);
 const ChatModel = mongoose.model("Chat", chatSchema);
 const PollModel = mongoose.model("Polls", pollSchema);
 
 
 
 auth.initialize(passport);
-routes(app, ChatModel, PollModel);
+routes(app, UserModel, ChatModel, PollModel);
 
 let serverPort = process.env.SERVER_PORT;
 app.listen(serverPort, () => {
