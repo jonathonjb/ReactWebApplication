@@ -32,5 +32,6 @@ const findUserFromId = async(User, id) => {
 
 module.exports = {
     addUser,
-    findUserFromUsername
+    findUserFromUsername,
+    findUserFromId
 }

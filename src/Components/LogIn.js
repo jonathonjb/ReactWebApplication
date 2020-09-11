@@ -24,7 +24,7 @@ class Login extends React.Component {
     }
 
     submission(){
-        let url = '/login/submit';
+        let url = '/login';
         xhr.open('POST', url, true);
         xhr.setRequestHeader('Content-Type', 'application/json');
         xhr.onreadystatechange = () => {

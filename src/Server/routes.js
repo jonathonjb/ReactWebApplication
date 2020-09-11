@@ -7,22 +7,20 @@ const bodyParser = require("body-parser");
 const session = require('express-session');
 
 const jsonParser = bodyParser.json();
-const urlencodedParser = bodyParser.urlencoded({extended: false});
 
-module.exports = (app, UserModel, ChatModel, PollModel) => {
+module.exports = (app, passport, UserModel, ChatModel, PollModel) => {
     // authentication middleware
     function authenticate(req, res, next) {
+        console.log('authenticate (middleware)');
         passport.authenticate('local', (err, user, info) => {
             if(err){
-                res.send(JSON.stringify({'status': 'failure', 'message': 'error with authentication process'}));
+                next();
             }
-            if(!user){
-                res.send(JSON.stringify({'status': 'failure', 'message': 'user not found in the database'}));
+            else if(!user){
+                next();
             }
-            else{
-                res.send(JSON.stringify({'status': 'success'}));
-            }
-        })
+            req.login(user, next);
+        })(req, res, next);
     }
     
     app.get('/', (req, res) => {
@@ -47,6 +45,16 @@ module.exports = (app, UserModel, ChatModel, PollModel) => {
                 res.send({'status': 'failure', 'message': 'The username already exists.'});
             }
         });
+    });
+
+    app.post('/login', jsonParser, authenticate, (req, res) => {
+        console.log('at post /login');
+        if(req.isAuthenticated()){
+            res.send(JSON.stringify({'status': 'success'}));
+        }
+        else{
+            res.send(JSON.stringify({'status': 'failure'}));
+        }
     });
 
     app.post('/chat/message_submit', jsonParser, (req, res) => {

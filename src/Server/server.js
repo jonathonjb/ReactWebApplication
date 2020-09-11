@@ -7,14 +7,16 @@ const passport = require('passport');
 
 const auth = require('./auth');
 const routes = require('./routes');
+const { findUserFromUsername, findUserFromId } = require('./userCollectionManager');
 
 const app = express();
 app.use(express.static(path.join(__dirname, "../../build")));
 app.use(pino);
+app.use(passport.initialize());
+app.use(passport.session());
 
 const mongoUri = process.env.MONGO_URI;
 mongoose.connect(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true });
-
 
 
 const userSchema = mongoose.Schema({
@@ -32,14 +34,13 @@ const pollSchema = mongoose.Schema({
     votes: {type: [Number], required: true},
     datePosted: {type: Date, default: Date.now}
 });
-const UserModel = mongoose.model("User", userSchema);
-const ChatModel = mongoose.model("Chat", chatSchema);
-const PollModel = mongoose.model("Polls", pollSchema);
+const UserCollection = mongoose.model("User", userSchema);
+const ChatCollection = mongoose.model("Chat", chatSchema);
+const PollCollection = mongoose.model("Polls", pollSchema);
 
 
-
-auth.initialize(passport);
-routes(app, UserModel, ChatModel, PollModel);
+auth.initialize(passport, UserCollection, findUserFromUsername, findUserFromId);
+routes(app, passport, UserCollection, ChatCollection, PollCollection);
 
 let serverPort = process.env.SERVER_PORT;
 app.listen(serverPort, () => {

@@ -2,23 +2,19 @@ const mongoose = require('mongoose');
 const LocalStrategy = require('passport-local').Strategy;
 const bcrypt = require('bcrypt');
 
-const userSchema = mongoose.Schema({
-    username: {type: String, required: true},
-    password: {type: String, required: true}
-});
-
-const initialize = (passport) => {
+const initialize = (passport, UserCollection, getUserFromUsername, getUserFromId) => {
     const authenticateUser = async (username, password, done) => {
-        let user = getUserFromUsername(username);
+        console.log('authenticating user');
+        let user = await getUserFromUsername(UserCollection, username);
         if(user === null){
             return done(null, false, {message: 'The user with that username does not exist in the database.'});
         }
         try{
-            if(await bcrypt.compare(user.password, password)){
-                return done(null, true);
+            if(await bcrypt.compare(password, user.password)){
+                return done(null, user);
             }
             else{
-                return done(null, false, {message: 'The password is incorrect.'});
+                return done(null, false, {message: 'Passwords do not match'});
             }
         }
         catch {
@@ -28,9 +24,11 @@ const initialize = (passport) => {
 
     passport.use(new LocalStrategy(authenticateUser));
     passport.serializeUser((user, done) => {
+        console.log('serializing user');
         return done(null, user._id);
     });
     passport.deserializeUser((id, done) => {
+        console.log('deserializing user');
         return done(null, getUserFromId(id));
     });
 }
