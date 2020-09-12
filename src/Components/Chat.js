@@ -11,7 +11,6 @@ const clearChatBox = () => {
 }
 
 const submitMessage = (name, message) => {
-    console.log('SUMMITING - name:' + name + ', message: ' + message);
     let url = '/chat/message_submit';
     xhr.open('POST', url, true); 
     xhr.setRequestHeader("Content-Type", "application/json"); 
@@ -116,7 +115,6 @@ class Chat extends React.Component {
 
     componentDidMount(){
         getAllMessages();
-        submitMessage(this.state.name, this.state.message);
     }
 
     render() {

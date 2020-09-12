@@ -3,15 +3,10 @@ const { createPollInstance, getAllPollInstances, deleteAllPollInstances, getPoll
 const { addUser, findUserFromUsername } = require("./userCollectionManager");
 const { makeMove } = require("./Chess/chessAi");
 const bcrypt = require('bcrypt');
-const bodyParser = require("body-parser");
-const session = require('express-session');
-
-const jsonParser = bodyParser.json();
 
 module.exports = (app, passport, UserModel, ChatModel, PollModel) => {
     // authentication middleware
     function authenticate(req, res, next) {
-        console.log('authenticate (middleware)');
         passport.authenticate('local', (err, user, info) => {
             if(err){
                 next();
@@ -22,12 +17,21 @@ module.exports = (app, passport, UserModel, ChatModel, PollModel) => {
             req.login(user, next);
         })(req, res, next);
     }
+
+    function checkIfAuthenticated(req, res, next) {
+        if(!req.isAuthenticated()){
+            res.send(JSON.stringify({'authenticated': false}));
+        }
+        else{
+            next();
+        }
+    }
     
-    app.get('/', (req, res) => {
+    app.get('/', checkIfAuthenticated, (req, res) => {
         res.sendFile(path.join(__dirname, "../../build", "index.html"));
     });
 
-    app.post('/register', jsonParser, async (req, res) => {
+    app.post('/register', async (req, res) => {
         let data = req.body;
         let hashedPassword = await bcrypt.hash(data.password, 10);
         findUserFromUsername(UserModel, data.username).then(result => {
@@ -47,7 +51,7 @@ module.exports = (app, passport, UserModel, ChatModel, PollModel) => {
         });
     });
 
-    app.post('/login', jsonParser, authenticate, (req, res) => {
+    app.post('/login', authenticate, (req, res) => {
         console.log('at post /login');
         if(req.isAuthenticated()){
             res.send(JSON.stringify({'status': 'success'}));
@@ -57,7 +61,7 @@ module.exports = (app, passport, UserModel, ChatModel, PollModel) => {
         }
     });
 
-    app.post('/chat/message_submit', jsonParser, (req, res) => {
+    app.post('/chat/message_submit', checkIfAuthenticated, (req, res) => {
         let data = req.body;
         let obj = {
             "status": "failure"
@@ -97,7 +101,7 @@ module.exports = (app, passport, UserModel, ChatModel, PollModel) => {
         });
     });
 
-    app.post('/polls/create_poll', jsonParser, (req, res) => {
+    app.post('/polls/create_poll', (req, res) => {
         let data = req.body;
 
         createPollInstance(PollModel, data.question, data.choices).then((status) => {
@@ -139,7 +143,7 @@ module.exports = (app, passport, UserModel, ChatModel, PollModel) => {
         });
     });
 
-    app.post('/polls/submit', jsonParser, (req, res) => {
+    app.post('/polls/submit', (req, res) => {
         let data = req.body;
         getPollInstace(PollModel, data.id).then(instance => {
             instance = instance[0];
@@ -162,7 +166,7 @@ module.exports = (app, passport, UserModel, ChatModel, PollModel) => {
         });
     });
 
-    app.post('/chess/send', jsonParser, (req, res) => {
+    app.post('/chess/send', (req, res) => {
         let data = req.body;
         let board = data.board;
         let color = data.aiColor;

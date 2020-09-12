@@ -4,14 +4,22 @@ const path = require("path");
 const pino = require('express-pino-logger')();
 const mongoose = require("mongoose");
 const passport = require('passport');
+const bodyParser = require('body-parser');
+const session = require('express-session');
 
 const auth = require('./auth');
 const routes = require('./routes');
 const { findUserFromUsername, findUserFromId } = require('./userCollectionManager');
 
 const app = express();
+app.use(session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false
+}));
 app.use(express.static(path.join(__dirname, "../../build")));
 app.use(pino);
+app.use(bodyParser.json());
 app.use(passport.initialize());
 app.use(passport.session());
 

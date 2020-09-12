@@ -32,7 +32,7 @@ class Login extends React.Component {
                 let data = JSON.parse(xhr.responseText);
                 if(data.status === 'success'){
                     this.setState({
-                        redirect: '/'
+                        redirect: '/chat'
                     });
                 }
                 else{
