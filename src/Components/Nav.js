@@ -3,6 +3,9 @@ import '../Stylesheets/Nav.css';
 import { Link } from 'react-router-dom';
 import 'bootstrap/js/dist/collapse';
 import $ from 'jquery';
+import 'react-redux';
+import {login, logout} from '../ActionCreators/actionCreators';
+import {connect} from 'react-redux';
 
 class Nav extends React.Component {
     constructor(props){
@@ -12,6 +15,7 @@ class Nav extends React.Component {
             activeId: 'home'
         }
         this.changeActive = this.changeActive.bind(this);
+        this.testClick = this.testClick.bind(this);
     }
 
     changeActive(event){
@@ -20,6 +24,17 @@ class Nav extends React.Component {
         this.setState({
             activeId: event.target.id
         });
+    }
+
+    testClick(){
+        if(this.props.auth.loggedIn){
+            console.log("LOGGING OUT");
+            this.props.logout();
+        }
+        else{
+            console.log("LOGGING IN");
+            this.props.login();
+        }
     }
 
     render() {
@@ -64,13 +79,31 @@ class Nav extends React.Component {
                     </li>
 
                     <li className="nav-item">
-                    <Link to='/login' className="nav-link" id='login' onClick={this.changeActive}>Log-In</Link>
+                        {this.props.auth.loggedIn ? 
+                            <Link to='/logout' className="nav-link" id='logout' onClick={this.changeActive}>Log-Out</Link> :
+                            <Link to='/login' className="nav-link" id='login' onClick={this.changeActive}>Log-In</Link> }
                     </li>
-                    
+            
+
+                    <li className='nav-item' onClick={this.testClick} style={{'color': 'white'}}>
+                        QUICK LOGIN/LOGOUT
+                    </li>
                 </ul>
             </nav>
         );
     }
 }
 
-export default Nav
+const mapStateToProps = state => {
+    return {
+        auth: state.auth
+    }
+}
+
+const mapDispatchToProps = {
+    login, 
+    logout
+}
+
+
+export default connect(mapStateToProps, mapDispatchToProps)(Nav);

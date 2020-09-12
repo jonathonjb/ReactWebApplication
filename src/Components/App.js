@@ -2,7 +2,6 @@ import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min';
 import {Route, Switch } from 'react-router-dom';
-
 import '../Stylesheets/App.css';
 
 import Nav from './Nav';
@@ -16,10 +15,12 @@ import Chat from './Chat';
 import NewChat from './NewChat';
 import Polls from './Polls';
 import Resume from './Resume';
-import LogIn from './LogIn';
+import Login from './Login';
+import Logout from './Logout';
 import Register from './Register';
 
 function App() {
+
   return (
     <div className="App">
       <Nav /> 
@@ -34,7 +35,8 @@ function App() {
           <Route path='/newchat' component={NewChat} />
           <Route path='/polls' component={Polls} />
           <Route path='/resume' component={Resume} />
-          <Route path='/login' component={LogIn} />
+          <Route path='/login' component={Login} />
+          <Route path='/logout' component={Logout} />
           <Route path='/register' component={Register} />
           <Route component={Error} />
         </Switch>
@@ -42,5 +44,6 @@ function App() {
     </div>
   );
 }
+
 
 export default App;

@@ -5,7 +5,7 @@ const { makeMove } = require("./Chess/chessAi");
 const bcrypt = require('bcrypt');
 
 module.exports = (app, passport, UserModel, ChatModel, PollModel) => {
-    // authentication middleware
+    // authentication - middleware
     function authenticate(req, res, next) {
         passport.authenticate('local', (err, user, info) => {
             if(err){
@@ -18,6 +18,7 @@ module.exports = (app, passport, UserModel, ChatModel, PollModel) => {
         })(req, res, next);
     }
 
+    // check if user is authenticated - middleware
     function checkIfAuthenticated(req, res, next) {
         if(!req.isAuthenticated()){
             res.send(JSON.stringify({'authenticated': false}));
@@ -27,7 +28,7 @@ module.exports = (app, passport, UserModel, ChatModel, PollModel) => {
         }
     }
     
-    app.get('/', checkIfAuthenticated, (req, res) => {
+    app.get('/', (req, res) => {
         res.sendFile(path.join(__dirname, "../../build", "index.html"));
     });
 
@@ -51,8 +52,7 @@ module.exports = (app, passport, UserModel, ChatModel, PollModel) => {
         });
     });
 
-    app.post('/login', authenticate, (req, res) => {
-        console.log('at post /login');
+    app.post('/login', authenticate, (req, res) => { 
         if(req.isAuthenticated()){
             res.send(JSON.stringify({'status': 'success'}));
         }
