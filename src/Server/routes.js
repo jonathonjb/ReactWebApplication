@@ -32,6 +32,10 @@ module.exports = (app, passport, UserModel, ChatModel, PollModel) => {
         res.sendFile(path.join(__dirname, "../../build", "index.html"));
     });
 
+    app.post('/', (req, res) => {
+        res.send(JSON.stringify({'authenticated': req.isAuthenticated()}));
+    });
+
     app.post('/register', async (req, res) => {
         let data = req.body;
         let hashedPassword = await bcrypt.hash(data.password, 10);
@@ -59,6 +63,11 @@ module.exports = (app, passport, UserModel, ChatModel, PollModel) => {
         else{
             res.send(JSON.stringify({'status': 'failure'}));
         }
+    });
+
+    app.post('/logout', (req, res) => {
+        req.logout();
+        res.send(JSON.stringify({'status': 'success'}));
     });
 
     app.post('/chat/message_submit', checkIfAuthenticated, (req, res) => {

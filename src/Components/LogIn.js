@@ -1,4 +1,6 @@
 import React from 'react'
+import {connect} from 'react-redux';
+import {login} from '../ActionCreators/actionCreators';
 import { Link, Redirect } from 'react-router-dom';
 
 const xhr = new XMLHttpRequest();
@@ -31,6 +33,7 @@ class Login extends React.Component {
             if(xhr.readyState === 4 && xhr.status === 200){
                 let data = JSON.parse(xhr.responseText);
                 if(data.status === 'success'){
+                    this.props.login();
                     this.setState({
                         redirect: '/chat'
                     });
@@ -73,4 +76,14 @@ class Login extends React.Component {
     }
 }
 
-export default Login;
+const mapStateToProps = (state) => {
+    return {
+        auth: state.auth
+    };
+};
+
+const mapDispatchToProps = {
+    login
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Login);

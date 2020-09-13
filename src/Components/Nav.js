@@ -4,8 +4,10 @@ import { Link } from 'react-router-dom';
 import 'bootstrap/js/dist/collapse';
 import $ from 'jquery';
 import 'react-redux';
-import {login, logout} from '../ActionCreators/actionCreators';
+import {logout} from '../ActionCreators/actionCreators';
 import {connect} from 'react-redux';
+
+const xhr = new XMLHttpRequest();
 
 class Nav extends React.Component {
     constructor(props){
@@ -15,7 +17,7 @@ class Nav extends React.Component {
             activeId: 'home'
         }
         this.changeActive = this.changeActive.bind(this);
-        this.testClick = this.testClick.bind(this);
+        this.logoutFromServer = this.logoutFromServer.bind(this);
     }
 
     changeActive(event){
@@ -26,15 +28,23 @@ class Nav extends React.Component {
         });
     }
 
-    testClick(){
-        if(this.props.auth.loggedIn){
-            console.log("LOGGING OUT");
-            this.props.logout();
+    logoutFromServer(){
+        let url = '/logout';
+        xhr.open('POST', url, true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.onreadystatechange = () => {
+            if(xhr.readyState === 4 && xhr.status === 200){
+                let data = JSON.parse(xhr.responseText);
+                if(data.status === 'success'){
+                    console.log('logged out');
+                    this.props.logout();
+                }
+                else{
+                    console.error('problem logging out');
+                }
+            }
         }
-        else{
-            console.log("LOGGING IN");
-            this.props.login();
-        }
+        xhr.send(null);
     }
 
     render() {
@@ -80,13 +90,8 @@ class Nav extends React.Component {
 
                     <li className="nav-item">
                         {this.props.auth.loggedIn ? 
-                            <Link to='/logout' className="nav-link" id='logout' onClick={this.changeActive}>Log-Out</Link> :
+                            <div style={{'cursor': 'pointer'}}className="nav-link" id='logout' onClick={this.logoutFromServer}>Log-Out</div> :
                             <Link to='/login' className="nav-link" id='login' onClick={this.changeActive}>Log-In</Link> }
-                    </li>
-            
-
-                    <li className='nav-item' onClick={this.testClick} style={{'color': 'white'}}>
-                        QUICK LOGIN/LOGOUT
                     </li>
                 </ul>
             </nav>
@@ -101,7 +106,6 @@ const mapStateToProps = state => {
 }
 
 const mapDispatchToProps = {
-    login, 
     logout
 }
 
