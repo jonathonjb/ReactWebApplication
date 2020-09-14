@@ -35,7 +35,6 @@ class App extends React.Component {
             if(xhr.readyState === 4 && xhr.status === 200){
                 let data = JSON.parse(xhr.responseText);
                 let isAuthenticated = data.authenticated;
-                console.log(isAuthenticated);
                 if(isAuthenticated){
                     console.log(data.username);
                     this.props.login(data.username);

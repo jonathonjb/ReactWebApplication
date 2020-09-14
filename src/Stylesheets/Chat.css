@@ -9,12 +9,3 @@
 textarea{
     border: 0.1em solid #666666;
 }
-
-.message-box{
-    background-color: #666666;
-    color: white;
-    text-align: center;
-    display: inline-block;
-    margin-top: 0.8em;
-    padding: 0.3em 0.9em 0.3em 0.9em;
-}

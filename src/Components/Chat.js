@@ -1,104 +1,25 @@
 import React from 'react';
 import '../Stylesheets/Chat.css';
 import {connect} from 'react-redux';
+import Message from './Message';
 
 const  xhr = new XMLHttpRequest();
-
-const clearChatBox = () => {
-    let chatBox = document.getElementById('chat-box');
-    while(chatBox.firstChild){
-        chatBox.removeChild(chatBox.firstChild);
-    }
-}
-
-const submitMessage = (name, message) => {
-    let url = '/chat/submit';
-    xhr.open('POST', url, true); 
-    xhr.setRequestHeader("Content-Type", "application/json"); 
-
-    xhr.onreadystatechange = () => {
-        if(xhr.readyState === 4 && xhr.status === 200){
-            // CHECK FOR SUCCESS
-            clearChatBox();
-            getAllMessages();
-        }
-    }
-
-    let data = JSON.stringify({
-        "name": name,
-        "message": message
-    });
-    xhr.send(data);
-}
-
-const getAllMessages = () => {
-    let url = '/chat/get_messages';
-    xhr.open('POST', url, true);
-    xhr.setRequestHeader('Content-Type', 'application/json');
-
-    xhr.onreadystatechange = () => {
-        if(xhr.readyState === 4 && xhr.status === 200){
-            let obj = JSON.parse(xhr.responseText);
-            if(obj.status === "success"){
-                let arrOfMessages = obj.data;
-                let chatBox = document.getElementById('chat-box');
-
-                arrOfMessages.forEach((item) => {
-                    let name = item.name;
-                    let message = item.message;
-                    let newDiv = document.createElement('div');
-                    newDiv.classList.add('message-box');
-                    newDiv.classList.add('rounded');
-                    newDiv.innerHTML = "<i>" + name + "</i> <br/>" + message;
-                    chatBox.appendChild(newDiv);
-                    chatBox.appendChild(document.createElement('br'));
-                });
-                chatBox.appendChild(document.createElement('br'));
-            }
-            else{
-                console.log("CANNOT RETRIEVE MESSAGES");
-            }
-        }
-    }
-    xhr.send(null);
-}
-
-const deleteAllMessages = () => {
-    let url = '/chat/remove_all';
-    xhr.open('POST', url, true);
-    xhr.setRequestHeader('Content-Type', 'application/json');
-
-    xhr.onreadystatechange = () => {
-        if(xhr.readyState === 4 && xhr.status === 200){
-            let obj = JSON.parse(xhr.responseText);
-            if(obj.status === "success"){
-                clearChatBox();
-            }
-            else{
-                console.log("CANNOT RETRIEVE MESSAGES");
-            }
-        }
-    }
-    xhr.send(null);
-}
-
 
 class Chat extends React.Component {
     constructor(props){
         super(props);
         this.state = {
-            name: "Anonymous",
+            usernames: [],
+            messages: [],
             message: ""
         }
-        this.handleNameChange = this.handleNameChange.bind(this);
         this.handleMessageChange = this.handleMessageChange.bind(this);
         this.enterPressed = this.enterPressed.bind(this);
-    }
-
-    handleNameChange(event){
-        this.setState({
-            name: event.target.value
-        });
+        this.renderMessages = this.renderMessages.bind(this);
+        this.clearChatBox = this.clearChatBox.bind(this);
+        this.submitMessage = this.submitMessage.bind(this);
+        this.getAllMessages = this.getAllMessages.bind(this);
+        this.deleteAllMessages = this.deleteAllMessages.bind(this);
     }
 
     handleMessageChange(event){
@@ -110,12 +31,98 @@ class Chat extends React.Component {
     enterPressed(event){
         let key = event.key;
         if(key === 'Enter'){
-            submitMessage(this.state.name, this.state.message);
+            this.submitMessage(this.state.name, this.state.message);
         }
     }
 
+    renderMessages(){
+        let messages = [];
+        for(let i = 0; i < this.state.messages.length; i++){
+            let username = this.state.usernames[i];
+            let message = this.state.messages[i];
+            messages.push(<div><Message username={username} message={message}/><br /></div>);
+        }
+        return messages;
+    }
+
+    clearChatBox(){
+        this.setState({
+            usernames: [],
+            messages: []
+        });
+    }
+
+    submitMessage(){
+        let url = '/chat/submit';
+        xhr.open('POST', url, true); 
+        xhr.setRequestHeader("Content-Type", "application/json"); 
+    
+        xhr.onreadystatechange = () => {
+            if(xhr.readyState === 4 && xhr.status === 200){
+                // CHECK FOR SUCCESS
+                this.clearChatBox();
+                this.getAllMessages();
+            }
+        }
+    
+        let data = JSON.stringify({
+            "message": this.state.message
+        });
+        xhr.send(data);
+    }
+
+    getAllMessages(){
+        let url = '/chat/get_messages';
+        xhr.open('POST', url, true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+    
+        xhr.onreadystatechange = () => {
+            if(xhr.readyState === 4 && xhr.status === 200){
+                let obj = JSON.parse(xhr.responseText);
+                if(obj.status === "success"){
+                    let usernames = [];
+                    let messages = [];
+
+                    let arrOfMessages = obj.data;
+                    arrOfMessages.forEach(item => {
+                        usernames.push(item.name);
+                        messages.push(item.message);
+                    });
+
+                    this.setState({
+                        usernames: usernames,
+                        messages: messages
+                    });
+                }
+                else{
+                    console.log("CANNOT RETRIEVE MESSAGES");
+                }
+            }
+        }
+        xhr.send(null);
+    }
+
+    deleteAllMessages(){
+        let url = '/chat/remove_all';
+        xhr.open('POST', url, true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+    
+        xhr.onreadystatechange = () => {
+            if(xhr.readyState === 4 && xhr.status === 200){
+                let obj = JSON.parse(xhr.responseText);
+                if(obj.status === "success"){
+                    this.clearChatBox();
+                }
+                else{
+                    console.log("CANNOT RETRIEVE MESSAGES");
+                }
+            }
+        }
+        xhr.send(null);
+    }
+
     componentDidMount(){
-        getAllMessages();
+        this.getAllMessages();
     }
 
     render() {
@@ -123,7 +130,9 @@ class Chat extends React.Component {
             <div>
                 <br />
                 <div className="row">
-                    <div id='chat-box' className="offset-md-2 col-md-8 rounded shadow" />
+                    <div id='chat-box' className="offset-md-2 col-md-8 rounded shadow">
+                        {this.renderMessages()}
+                    </div>
                 </div>
                 <br />
                 {
@@ -135,9 +144,9 @@ class Chat extends React.Component {
                         </div>
                         <br />
                         <div className="row">
-                            <button className='offset-md-2 btn btn-primary' onClick={() => submitMessage(this.state.name, this.state.message)}>Submit</button>
+                            <button className='offset-md-2 btn btn-primary' onClick={this.submitMessage}>Submit</button>
                             &nbsp;&nbsp;&nbsp;&nbsp;
-                            <button className='btn btn-danger' onClick={deleteAllMessages}>Delete all</button>
+                            <button className='btn btn-danger' onClick={this.deleteAllMessages}>Delete all</button>
                         </div>
                         <br/><br/><br/>
                     </div>
