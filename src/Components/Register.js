@@ -48,7 +48,7 @@ class SignUp extends React.Component {
                 let data = JSON.parse(xhr.responseText);
                 if(data.status === 'success'){
                     this.setState({
-                        redirect: '/newchat'
+                        redirect: '/chat'
                     });
                 }
                 else{
@@ -73,13 +73,13 @@ class SignUp extends React.Component {
                 <div className='row justify-content-center'>
                     <form className='form-group' method='post' action='/signup/submit'>
                         <label>Username: </label>
-                        <input type='text' placeholder='username' name='username' onChange={this.onChangeUsername} required />
+                        <input type='text' placeholder='Enter Username' name='username' onChange={this.onChangeUsername} required />
                         <br /><br />
                         <label>Password: </label>&nbsp;
-                        <input type='password' placeholder='password' name='password' ref={this.passwordRef} required />
+                        <input type='password' placeholder='Enter Password' name='password' ref={this.passwordRef} required />
                         <br /><br />
                         <label>Retype Password: </label>&nbsp;
-                        <input type='password' placeholder='password' name='password' ref={this.passwordRepeatRef} required />
+                        <input type='password' placeholder='Retype Password' name='password' ref={this.passwordRepeatRef} required />
                         <br /><br />
                     </form>
                 </div>

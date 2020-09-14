@@ -65,6 +65,11 @@ class Chat extends React.Component {
         xhr.onreadystatechange = () => {
             if(xhr.readyState === 4 && xhr.status === 200){
                 // CHECK FOR SUCCESS
+
+                this.setState({
+                    message: ''
+                });
+
                 this.clearChatBox();
                 this.getAllMessages();
             }
@@ -126,6 +131,16 @@ class Chat extends React.Component {
         xhr.send(null);
     }
 
+    scrollToBottom(){
+        console.log('END ELEMENT:');
+        console.log(this.endElement);
+        this.endElement.scrollIntoView({behavior: 'auto'});
+    }
+
+    componentDidUpdate(){
+        this.scrollToBottom();
+    }
+
     componentDidMount(){
         this.getAllMessages();
     }
@@ -133,10 +148,10 @@ class Chat extends React.Component {
     render() {
         return (
             <div>
-                <br />
                 <div className="row">
                     <div id='chat-box' className="offset-md-2 col-md-8 rounded shadow">
                         {this.renderMessages()}
+                        <div className="lastItem" ref={currElement => {this.endElement = currElement}} />
                     </div>
                 </div>
                 <br />
@@ -145,7 +160,7 @@ class Chat extends React.Component {
                     <div>
                         <div className="row">
                             <textarea id='chat-message' onChange={this.handleMessageChange} onKeyPress={this.enterPressed.bind(this)} 
-                                className="offset-md-2 col-md-8 rounded shadow" rows="3" />
+                                className="offset-md-2 col-md-8 rounded shadow" rows="3" value={this.state.message}/>
                         </div>
                         <br />
                         <div className="row">
@@ -153,7 +168,6 @@ class Chat extends React.Component {
                             &nbsp;&nbsp;&nbsp;&nbsp;
                             <button className='btn btn-danger' onClick={this.deleteAllMessages}>Delete all</button>
                         </div>
-                        <br/><br/><br/>
                     </div>
                     :
                     <div />

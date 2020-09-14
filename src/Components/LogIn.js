@@ -57,7 +57,7 @@ class Login extends React.Component {
                 <div className='row justify-content-center'>
                     <form className='form-group' action='/login' method='POST'>
                         <label>Username: </label>
-                        <input type='text' placeholder='username' name='username' onChange={this.onChangeUsername} required />
+                        <input type='text' placeholder='Enter Username' name='username' onChange={this.onChangeUsername} required />
                         <br /><br />
                         <label>Password: </label>&nbsp;
                         <input type='password' placeholder='Enter password' name='password' ref={this.passwordRef} required />
