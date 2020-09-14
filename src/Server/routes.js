@@ -74,17 +74,17 @@ module.exports = (app, passport, UserModel, ChatModel, PollModel) => {
         res.send(JSON.stringify({'status': 'success'}));
     });
 
-    app.post('/chat/message_submit', checkIfAuthenticated, (req, res) => {
+    app.post('/chat/submit', checkIfAuthenticated, (req, res) => {
         let data = req.body;
-        let obj = {
-            "status": "failure"
-        };
 
-        if(createChatInstance(ChatModel, data.name, data.message)){
-            obj.status = "success";
-        }
-
-        res.send(JSON.stringify(obj));
+        createChatInstance(ChatModel, req.user.username, data.message).then(data => {
+            if(data !== null){
+                res.send(JSON.stringify({'status': 'success'}));
+            }
+            else{
+                res.send(JSON.stringify({'status': 'failure'}));
+            }
+        });
     });
 
     app.post('/chat/remove_all', (req, res) => {

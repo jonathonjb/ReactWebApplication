@@ -77,10 +77,6 @@ class Nav extends React.Component {
                     </li>
 
                     <li className="nav-item">
-                    <Link to='/newchat' className="nav-link" id='newchat' onClick={this.changeActive}>New Chat</Link>
-                    </li>
-
-                    <li className="nav-item">
                     <Link to='/polls' className="nav-link" id='polls' onClick={this.changeActive}>Polls</Link>
                     </li>
 

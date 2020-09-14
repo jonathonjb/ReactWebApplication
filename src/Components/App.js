@@ -15,7 +15,6 @@ import LanguageClassifier from './Projects/LanguageClassifier';
 import PathFinder from './Projects/PathFinder';
 import Zombies from './Projects/Zombies';
 import Chat from './Chat';
-import NewChat from './NewChat';
 import Polls from './Polls';
 import Resume from './Resume';
 import Login from './Login';
@@ -61,7 +60,6 @@ class App extends React.Component {
                         <Route path='/projects/path_finder' component={PathFinder} />
                         <Route path='/projects/zombies' component={Zombies} />
                         <Route path='/chat' component={Chat} />
-                        <Route path='/newchat' component={NewChat} />
                         <Route path='/polls' component={Polls} />
                         <Route path='/resume' component={Resume} />
                         <Route path='/login' component={Login} />

@@ -1,5 +1,6 @@
-import React from 'react'
-import '../Stylesheets/Chat.css'
+import React from 'react';
+import '../Stylesheets/Chat.css';
+import {connect} from 'react-redux';
 
 const  xhr = new XMLHttpRequest();
 
@@ -11,7 +12,7 @@ const clearChatBox = () => {
 }
 
 const submitMessage = (name, message) => {
-    let url = '/chat/message_submit';
+    let url = '/chat/submit';
     xhr.open('POST', url, true); 
     xhr.setRequestHeader("Content-Type", "application/json"); 
 
@@ -122,28 +123,36 @@ class Chat extends React.Component {
             <div>
                 <br />
                 <div className="row">
-                    <div id='chat-box' className="col-md-8 rounded shadow">
-                        {/*test*/}
-                        {/*<div className="message-box">Name<br />Hi there, my name is Jonathon Brandt! How are you doing today? Me, I'm doing fine. I'm watching some playoffs basketball. I really fucking hope the bucks win lol.</div>
-                        */}
+                    <div id='chat-box' className="offset-md-2 col-md-8 rounded shadow" />
+                </div>
+                <br />
+                {
+                    this.props.auth.loggedIn ?
+                    <div>
+                        <div className="row">
+                            <textarea id='chat-message' onChange={this.handleMessageChange} onKeyPress={this.enterPressed.bind(this)} 
+                                className="offset-md-2 col-md-8 rounded shadow" rows="3" />
+                        </div>
+                        <br />
+                        <div className="row">
+                            <button className='offset-md-2 btn btn-primary' onClick={() => submitMessage(this.state.name, this.state.message)}>Submit</button>
+                            &nbsp;&nbsp;&nbsp;&nbsp;
+                            <button className='btn btn-danger' onClick={deleteAllMessages}>Delete all</button>
+                        </div>
+                        <br/><br/><br/>
                     </div>
-                </div>
-                <br />
-                <div className="row">
-                    <textarea id='chat-name'  onChange={this.handleNameChange} className="col-md-2 rounded shadow" placeholder="Name" rows="1"/>
-                    <div className="col-md-1"/>
-                    <textarea id='chat-message' onChange={this.handleMessageChange} onKeyPress={this.enterPressed.bind(this)} 
-                        className="col-md-5 rounded shadow" rows="3" />
-                </div>
-                <br />
-                <div className="row">
-                    <button className='btn btn-primary' onClick={() => submitMessage(this.state.name, this.state.message)}>Submit</button>
-                    &nbsp;&nbsp;&nbsp;&nbsp;
-                    <button className='btn btn-danger' onClick={deleteAllMessages}>Delete all</button>
-                </div>
+                    :
+                    <div />
+                }
             </div>
         )
     }
 }
 
-export default Chat;
+const mapStateToProps = (state) => {
+    return {
+        auth: state.auth
+    }
+}
+
+export default connect(mapStateToProps)(Chat);
