@@ -2,13 +2,24 @@
     background-color: #666666;
     color: white;
     text-align: center;
-    display: inline-block;
     padding: 0.3em 0.9em 0.3em 0.9em;
-    max-width: 45%;
+    max-width: 15em;
+}
+
+.messageContainer{
+    margin: 0.1em 0 0 0.5em;
+}
+
+.userMessageContainer{
+    margin: 0.1em 0.5em 0 auto;
+}
+
+.userMessage{
+    background-color: #5882ff;
 }
 
 h6 {
     color: black;
-    font-size: xx-small;
+    font-size: 0.6em;
     margin-bottom: 0;
 }

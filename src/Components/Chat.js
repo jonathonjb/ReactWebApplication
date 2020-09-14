@@ -40,7 +40,12 @@ class Chat extends React.Component {
         for(let i = 0; i < this.state.messages.length; i++){
             let username = this.state.usernames[i];
             let message = this.state.messages[i];
-            messages.push(<div><Message username={username} message={message}/><br /></div>);
+
+            let userMessage = false;
+            if(this.props.auth.username === username){
+                userMessage = true;
+            }
+            messages.push(<div><Message username={username} message={message} userMessage={userMessage}/><br /></div>);
         }
         return messages;
     }
