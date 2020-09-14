@@ -19,7 +19,6 @@ import NewChat from './NewChat';
 import Polls from './Polls';
 import Resume from './Resume';
 import Login from './Login';
-import Logout from './Logout';
 import Register from './Register';
 
 const xhr = new XMLHttpRequest();
@@ -39,7 +38,8 @@ class App extends React.Component {
                 let isAuthenticated = data.authenticated;
                 console.log(isAuthenticated);
                 if(isAuthenticated){
-                    this.props.login();
+                    console.log(data.username);
+                    this.props.login(data.username);
                 }
                 else{
                     this.props.logout();
@@ -65,7 +65,6 @@ class App extends React.Component {
                         <Route path='/polls' component={Polls} />
                         <Route path='/resume' component={Resume} />
                         <Route path='/login' component={Login} />
-                        <Route path='/logout' component={Logout} />
                         <Route path='/register' component={Register} />
                         <Route component={Error} />
                 </Switch>

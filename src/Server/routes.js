@@ -33,7 +33,11 @@ module.exports = (app, passport, UserModel, ChatModel, PollModel) => {
     });
 
     app.post('/', (req, res) => {
-        res.send(JSON.stringify({'authenticated': req.isAuthenticated()}));
+        let username = null;
+        if(req.isAuthenticated()){
+            username = req.user.username;
+        }
+        res.send(JSON.stringify({'authenticated': req.isAuthenticated(), 'username': username}));
     });
 
     app.post('/register', async (req, res) => {

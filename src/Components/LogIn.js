@@ -33,7 +33,7 @@ class Login extends React.Component {
             if(xhr.readyState === 4 && xhr.status === 200){
                 let data = JSON.parse(xhr.responseText);
                 if(data.status === 'success'){
-                    this.props.login();
+                    this.props.login(this.state.username);
                     this.setState({
                         redirect: '/chat'
                     });
