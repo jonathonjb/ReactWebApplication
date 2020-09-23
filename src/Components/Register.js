@@ -48,7 +48,7 @@ class SignUp extends React.Component {
                 let data = JSON.parse(xhr.responseText);
                 if(data.status === 'success'){
                     this.setState({
-                        redirect: '/chat'
+                        redirect: '/login'
                     });
                 }
                 else{

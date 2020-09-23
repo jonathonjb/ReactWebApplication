@@ -3,6 +3,7 @@ const { createPollInstance, getAllPollInstances, deleteAllPollInstances, getPoll
 const { addUser, findUserFromUsername } = require("./userCollectionManager");
 const { makeMove } = require("./Chess/chessAi");
 const bcrypt = require('bcrypt');
+const path = require("path");
 
 module.exports = (app, passport, UserModel, ChatModel, PollModel) => {
     // authentication - middleware

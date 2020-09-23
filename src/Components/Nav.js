@@ -87,7 +87,7 @@ class Nav extends React.Component {
                     <li className="nav-item">
                         {this.props.auth.loggedIn ? 
                             <div style={{'cursor': 'pointer'}}className="nav-link" id='logout' onClick={this.logoutFromServer}>Log-Out</div> :
-                            <Link to='/login' className="nav-link" id='login' onClick={this.changeActive}>Log-In</Link> }
+                            <Link to='/login' className="nav-link ml-auto" id='login' onClick={this.changeActive}>Log-In</Link> }
                     </li>
 
                     {this.props.auth.username !== null ? 

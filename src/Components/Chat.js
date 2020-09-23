@@ -132,7 +132,6 @@ class Chat extends React.Component {
     }
 
     scrollToBottom(){
-        console.log('END ELEMENT:');
         console.log(this.endElement);
         this.endElement.scrollIntoView({behavior: 'auto'});
     }

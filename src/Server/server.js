@@ -1,7 +1,10 @@
 require('dotenv').config();
 const express = require("express");
-const path = require("path");
-const pino = require('express-pino-logger')();
+const basicPino = require('pino');
+const basicPinoLogger = basicPino({prettyPrint: true})
+const expressPino = require('express-pino-logger')({
+    logger: basicPinoLogger
+});
 const mongoose = require("mongoose");
 const passport = require('passport');
 const bodyParser = require('body-parser');
@@ -17,8 +20,8 @@ app.use(session({
     resave: false,
     saveUninitialized: false
 }));
-app.use(express.static(path.join(__dirname, "../../build")));
-app.use(pino);
+app.use(express.static(__dirname + "/../../build"));
+app.use(expressPino);
 app.use(bodyParser.json());
 app.use(passport.initialize());
 app.use(passport.session());
