@@ -53,6 +53,7 @@ auth.initialize(passport, UserCollection, findUserFromUsername, findUserFromId);
 routes(app, passport, UserCollection, ChatCollection, PollCollection);
 
 let serverPort = process.env.SERVER_PORT;
-app.listen(serverPort | 8000, () => {
+let deploymentPort = process.env.PORT;
+app.listen(deploymentPort | 8000, () => {
     console.log('server up and running at ' + serverPort);
 });
