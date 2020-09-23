@@ -30,6 +30,7 @@ module.exports = (app, passport, UserModel, ChatModel, PollModel) => {
     }
     
     app.get('/', (req, res) => {
+        console.log('**Rendering home directory**');
         res.sendFile(path.join(__dirname, "../../build", "index.html"));
     });
 
