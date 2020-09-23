@@ -4,6 +4,7 @@
   "description": "Jonathon Brandt's personal website",
   "version": "0.1.0",
   "private": true,
+  "main": "./src/Server/server.js",
   "dependencies": {
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.5.0",
@@ -31,12 +32,13 @@
     "xmlhttprequest": "^1.8.0"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "node ./src/Server/server.js",
+    "react-start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "server": "node-env-run ./src/Server/server.js --exec nodemon | pino-colada",
-    "dev": "run-p start server"
+    "server": "nodemon ./src/Server/server.js",
+    "dev": "run-p react-start server"
   },
   "eslintConfig": {
     "extends": "react-app"
