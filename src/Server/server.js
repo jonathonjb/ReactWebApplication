@@ -54,6 +54,6 @@ routes(app, passport, UserCollection, ChatCollection, PollCollection);
 
 let serverPort = process.env.SERVER_PORT;
 let deploymentPort = process.env.PORT;
-app.listen(deploymentPort || 8000, () => {
+app.listen(3001, () => {
     console.log('server up and running at ' + serverPort);
 });
