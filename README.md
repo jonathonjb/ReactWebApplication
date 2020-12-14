@@ -26,7 +26,7 @@ You can see what the page looks like below.
 
 ## Signing-In / Logging-In
 
-Because I wanted to gain some experience with the passport.js authentication libary, I added these log-in, sign-in pages. These will allow establish a persistent login session, which means, as long the server is running, the user will stay logged in until they log out of the page.
+Because I wanted to gain some experience with the passport.js authentication libary, I added these log-in, sign-in pages. These will establish a persistent login session, which means, as long the server is running, the user will stay logged in until they log out of the page.
 
 ![Sign-In](https://github.com/jonathonjb/ReactWebApplication/blob/master/readmeImages/SignIn.png)
 
